@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CBC Media · HQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0b16; --panel:#13152b; --panel2:#191c38; --line:#2c3158;
+    --ink:#eaf0ff; --ink2:#99a0d0; --ink3:#5b618f; --acc:#5fe4ef; --gold:#f0c85a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);font-family:'VT323',monospace}
+  body{
+    min-height:100vh;padding:14px;
+    background-image:radial-gradient(circle at 50% -10%,rgba(58,78,190,.5),transparent 60%),
+                     radial-gradient(circle at 90% 110%,rgba(150,70,190,.32),transparent 55%);
+    image-rendering:pixelated;
+  }
+  .wrap{max-width:1080px;margin:0 auto}
+  /* ── pixel-frame helper: sharp double border, zero blur ── */
+  .pf{border:2px solid var(--line);box-shadow:0 0 0 2px var(--bg),0 0 0 4px #1c2046;background:var(--panel)}
+
+  /* ── top bar ── */
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;margin-bottom:12px}
+  .logo{font-family:'Press Start 2P';font-size:13px;letter-spacing:1px;color:var(--ink)}
+  .logo b{color:var(--acc)} .logo span{color:var(--ink3)}
+  .pills{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .pill{font-size:17px;line-height:1;padding:6px 9px;border:2px solid var(--line);background:#0e1024;color:var(--ink2);letter-spacing:.5px}
+  .pill b{color:var(--acc)} .pill .dz{color:var(--gold)}
+  .pill.gold{color:var(--gold)} #clock{color:var(--ink);min-width:78px;text-align:center}
+
+  /* ── stat chips ── */
+  .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px}
+  .stat{padding:10px 12px;text-align:center}
+  .stat .n{font-family:'Press Start 2P';font-size:18px;color:var(--ink)}
+  .stat .l{font-size:16px;color:var(--ink2);letter-spacing:.5px;margin-top:6px;text-transform:uppercase}
+  .stat.c0 .n{color:var(--acc)} .stat.c1 .n{color:#fb7185} .stat.c2 .n{color:#f0c85a}
+  .stat.c3 .n{color:var(--ink3)} .stat.c4 .n{color:var(--ink3)}
+
+  /* ── main grid: stage + side ── */
+  .main{display:grid;grid-template-columns:1fr 286px;gap:12px;align-items:start}
+  @media(max-width:860px){.main{grid-template-columns:1fr}}
+
+  /* ── pixel HQ stage ── */
+  .stage{position:relative;width:100%;aspect-ratio:320/200;overflow:hidden;background:#06070f}
+  #hq{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+  .scan{position:absolute;inset:0;pointer-events:none;opacity:.16;
+        background:repeating-linear-gradient(0deg,#000 0 1px,transparent 1px 3px)}
+  .vig{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 60px rgba(0,0,0,.6)}
+  .grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr)}
+  .cell{position:relative;cursor:pointer;display:flex;align-items:flex-end;justify-content:center}
+  .cell:hover{box-shadow:inset 0 0 0 2px rgba(95,228,239,.7)}
+  .tag{font-size:15px;line-height:1;letter-spacing:.5px;padding:3px 6px;margin-bottom:5px;
+       background:rgba(6,8,18,.84);border:1px solid var(--line);color:var(--ink);white-space:nowrap}
+  .tag i{font-style:normal;color:var(--ink2);font-size:13px}
+  .tag b{display:inline-block;width:6px;height:6px;margin-right:5px;vertical-align:1px}
+  .cell.core .tag{border-color:var(--acc);color:var(--acc)}
+
+  /* ── side column ── */
+  .side{display:flex;flex-direction:column;gap:12px}
+  .card{padding:12px 13px}
+  .h{font-family:'Press Start 2P';font-size:10px;color:var(--ink2);letter-spacing:1px;margin-bottom:11px;text-transform:uppercase}
+  .lead{display:flex;align-items:center;gap:8px;padding:7px 6px;border-bottom:1px solid #1c2042;cursor:pointer;font-size:18px}
+  .lead:last-child{border-bottom:0} .lead:hover{background:#191c38}
+  .lead .av{width:22px;height:22px;flex:none;display:grid;place-items:center;font-size:12px;font-family:'Press Start 2P';color:#0a0b16}
+  .lead .nm{flex:1;line-height:1.05;color:var(--ink)} .lead .nm s{display:block;text-decoration:none;font-size:14px;color:var(--ink3)}
+  .lead .sg{font-size:13px;color:var(--gold);text-align:right;max-width:74px;line-height:1}
+
+  /* ── jarvis console ── */
+  .console{margin-top:12px;padding:12px 14px}
+  .cap{font-size:19px;color:var(--acc);min-height:24px;letter-spacing:.4px;margin-bottom:10px}
+  .cap.say{color:var(--ink)}
+  .cmd{display:flex;gap:8px;align-items:center}
+  .cmd .pr{color:var(--acc);font-size:20px}
+  #ask{flex:1;background:#0e1024;border:2px solid var(--line);color:var(--ink);font-family:'VT323';font-size:19px;padding:8px 10px;outline:none}
+  #ask:focus{border-color:var(--acc)}
+  .btn{font-family:'VT323';font-size:17px;padding:8px 12px;border:2px solid var(--line);background:#0e1024;color:var(--ink2);cursor:pointer;letter-spacing:.5px}
+  .btn:hover{color:var(--ink);border-color:var(--acc)} .btn.on{color:#0a0b16;background:var(--acc);border-color:var(--acc)}
+  .hint{font-size:14px;color:var(--ink3);margin-top:8px;letter-spacing:.5px}
+
+  /* ── drawer ── */
+  .scrim{position:fixed;inset:0;background:rgba(4,5,12,.7);opacity:0;pointer-events:none;transition:opacity .15s}
+  .scrim.on{opacity:1;pointer-events:auto}
+  .draw{position:fixed;top:0;right:0;height:100%;width:380px;max-width:92vw;background:var(--panel);
+        border-left:2px solid var(--line);transform:translateX(100%);transition:transform .18s;overflow-y:auto;z-index:5}
+  .draw.on{transform:none} .draw .in{padding:20px}
+  .draw .x{float:right;cursor:pointer;color:var(--ink3);font-size:24px;line-height:1}
+  .draw .code{font-family:'Press Start 2P';font-size:15px;letter-spacing:1px}
+  .draw .role{font-size:19px;color:var(--ink2);margin:8px 0 14px}
+  .draw .st{display:inline-block;font-size:15px;padding:4px 8px;border:1px solid var(--line);margin-bottom:16px;letter-spacing:.5px}
+  .sec{font-family:'Press Start 2P';font-size:9px;color:var(--ink3);letter-spacing:1px;margin:18px 0 8px;text-transform:uppercase}
+  .draw p{font-size:18px;color:var(--ink);line-height:1.35}
+  .wf{list-style:none} .wf li{font-size:17px;color:var(--ink2);line-height:1.3;padding:4px 0 4px 16px;position:relative}
+  .wf li::before{content:"▸";position:absolute;left:0;color:var(--acc)}
+  .kv{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+  .kv div{border:1px solid var(--line);padding:8px;text-align:center}
+  .kv .v{font-family:'Press Start 2P';font-size:13px;color:var(--ink)} .kv .k{font-size:13px;color:var(--ink3);margin-top:5px}
+  .rec{font-size:16px;color:var(--ink2);line-height:1.4;border-left:2px solid var(--line);padding-left:9px;margin-top:4px}
+  /* ── inside-a-room view ── */
+  #hq{transition:opacity .12s linear}
+  .rv{position:absolute;inset:0;display:none;flex-direction:column;justify-content:space-between;pointer-events:none;z-index:3}
+  .rv.on{display:flex}
+  .rvtop{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px}
+  .rvx{pointer-events:auto;font-family:'VT323';font-size:17px;padding:6px 11px;border:2px solid var(--line);background:rgba(8,10,22,.9);color:var(--ink);cursor:pointer;letter-spacing:.5px}
+  .rvx:hover{border-color:var(--acc);color:var(--acc)}
+  .rvtitle{font-family:'Press Start 2P';font-size:11px;color:#fff;text-shadow:2px 2px 0 #000;letter-spacing:1px}
+  .rvst{font-size:15px;padding:4px 8px;background:rgba(8,10,22,.9);border:1px solid var(--line);letter-spacing:.5px}
+  .rvbot{pointer-events:auto;margin:8px;padding:10px 12px;background:rgba(8,10,22,.92);border:2px solid var(--line)}
+  .rvbot .cur{font-size:18px;color:var(--ink);line-height:1.25;margin-bottom:9px}
+  .rvbot .wf{display:flex;flex-wrap:wrap;gap:6px}
+  .rvbot .wf span{font-size:14px;color:var(--ink2);background:#0e1024;border:1px solid var(--line);padding:3px 7px}
+  .rvbot .kv{display:flex;gap:14px;margin-top:9px;align-items:center}
+  .rvbot .kv b{font-family:'Press Start 2P';font-size:11px;color:var(--acc)} .rvbot .kv i{font-style:normal;font-size:14px;color:var(--ink3)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="bar pf" style="box-shadow:none;border-width:0 0 2px 0">
+    <div class="logo">CBC<b>MEDIA</b> <span>// HQ</span></div>
+    <div class="pills">
+      <span class="pill"><b>●</b> LIVE · YOUR CRM</span>
+      <span class="pill"><span class="dz">●</span> FLEET <b>STANDBY</b></span>
+      <span class="pill" id="clock">--:--:--</span>
+    </div>
+  </header>
+
+  <div class="stats">
+    <div class="stat pf c0"><div class="n" id="s-leads">74</div><div class="l">Leads</div></div>
+    <div class="stat pf c1"><div class="n">8</div><div class="l">Warm</div></div>
+    <div class="stat pf c2"><div class="n">28</div><div class="l">Follow-ups</div></div>
+    <div class="stat pf c3"><div class="n">0</div><div class="l">Meetings</div></div>
+    <div class="stat pf c4"><div class="n">0</div><div class="l">Clients</div></div>
+  </div>
+
+  <div class="main">
+    <div>
+      <div class="stage pf" style="background:#06070f">
+        <canvas id="hq" width="320" height="200"></canvas>
+        <div class="grid" id="grid"></div>
+        <div class="scan"></div>
+        <div class="vig"></div>
+        <div class="rv" id="rv">
+          <div class="rvtop">
+            <button class="rvx" onclick="exitRoom()">← EXIT</button>
+            <span class="rvtitle" id="rvtitle"></span>
+            <span class="rvst" id="rvst"></span>
+          </div>
+          <div class="rvbot" id="rvbot"></div>
+        </div>
+      </div>
+
+      <div class="console pf">
+        <div class="cap" id="cap">JARVIS online. Click a room to inspect an agent — or ask me anything.</div>
+        <div class="cmd">
+          <span class="pr">&gt;</span>
+          <input id="ask" placeholder="talk to jarvis… (or press space)" autocomplete="off">
+          <button class="btn" id="mic">MIC</button>
+          <button class="btn on" id="spk">VOICE</button>
+        </div>
+        <div class="hint">space / clap = listen · click JARVIS core for the briefing</div>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="card pf">
+        <div class="h">Warm Leads</div>
+        <div id="warm"></div>
+      </div>
+      <div class="card pf">
+        <div class="h">Territory</div>
+        <div style="font-size:18px;color:var(--ink2);line-height:1.4">
+          <span style="color:var(--acc)">▣</span> San Luis Obispo County<br>
+          <span style="font-size:15px;color:var(--ink3)">territory 01 / 13 · SLO → CA → US</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="draw pf" id="draw" style="box-shadow:none"><div class="in" id="drawin"></div></div>
+
+<script>
+const $=s=>document.querySelector(s);
+
+/* ───────────────── DATA (real CRM state, honest) ───────────────── */
+// state: standby (asleep) · warm (amber idle) · ready (awake, did work)
+const AG = {
+  pr:{code:'SCOUT', role:'Prospector', state:'ready', hue:[95,224,239], cell:0,
+     desc:'Finds local businesses by niche + geo that aren’t running Meta ads, dedupes against the CRM, and writes new leads in.',
+     st:'READY · 74 leads sourced',
+     wf:['Pull the next territory (SLO County first)','Find local service businesses','Drop anyone already in the CRM','Keep 10+ reviews, not running Meta ads','Capture name / phone / niche → ORACLE'],
+     stats:[['13','last run'],['74','in CRM'],['SLO','territory']],
+     rec:['First run 6/17 → +13 leads (HVAC, pools, pest, electrical)','Cloud version coded — pending Yelp key + setup','Browser version needs you present; headless one doesn’t']},
+  en:{code:'ORACLE', role:'Enricher', state:'standby', hue:[86,143,255], cell:1,
+     desc:'Finds the owner / decision-maker, a deliverable email, and confirms the business isn’t already advertising on Meta.',
+     st:'STANDBY', wf:['Find a real, deliverable email','Identify the owner / decision-maker','Check Facebook Ads Library','Confirm 10+ reviews','Flag qualified leads → FORGE'],
+     stats:[['0','enriched'],['—','bounces'],['idle','status']],
+     rec:['Built — not launched yet','Next: owner + email for rows 63–75','FB-ads check = its own mini-build']},
+  pb:{code:'FORGE', role:'Plan Builder', state:'standby', hue:[244,176,64], cell:2,
+     desc:'Builds a custom Meta ads growth plan per business — budget tier, audience, three creative angles, honest CPL.',
+     st:'STANDBY', wf:['Research the business + competitors','Pick a budget tier + audience','Write 3 creative angles for the niche','Project a realistic cost-per-lead','Build the plan doc → SCRIBE'],
+     stats:[['0','drafted'],['3','angles ea.'],['idle','status']],
+     rec:['Built — not launched yet','One plan doc per business','Honest benchmarks only']},
+  cw:{code:'SCRIBE', role:'Copywriter', state:'standby', hue:[168,130,255], cell:5,
+     desc:'Writes the short, human cold email that teases the plan — one specific observation, a link, no spam triggers.',
+     st:'STANDBY', wf:['3–4 sentence plain-text email','Open with one specific observation','Tease the plan + link the doc','Keep it human, no templates','Queue for your approval'],
+     stats:[['0','queued'],['1','plan link'],['idle','status']],
+     rec:['Built — not launched yet','Nothing sends without your approval','Varies language per lead']},
+  sd:{code:'RELAY', role:'Sender', state:'warm', hue:[61,214,140], cell:8,
+     desc:'Sends approved emails from charlie@cbcmediamarketing.com and manages the inbox warmup ramp.',
+     st:'PRE-WARMUP · DAY 0', wf:['Hold until you approve the day’s emails','Ramp ~10/day → ~40/day over 2–3 wks','Send plain-text from charlie@','Watch bounce + spam, pause if spikes','Log every send'],
+     stats:[['0','sent'],['Day 0','warmup'],['✓','SPF/DKIM']],
+     rec:['Inbox configured — SPF/DKIM/DMARC passing','Warmup not started','Ready to ramp on your go']},
+  rt:{code:'SENTRY', role:'Reply Triage', state:'standby', hue:[251,113,133], cell:7,
+     desc:'Reads the inbox and flags every reply warm / not / unsubscribe — never auto-replies, drafts for your approval.',
+     st:'STANDBY', wf:['Read new replies to charlie@','Classify warm / not / unsubscribe','Push warm ones to the Warm list','Draft a reply for your approval','Honor unsubscribes instantly'],
+     stats:[['0','warm'],['100%','to you'],['idle','status']],
+     rec:['Built — not launched yet','Will draft replies for approval','Watches once email goes out']},
+  bk:{code:'CLOSER', role:'Booking', state:'standby', hue:[240,200,90], cell:6,
+     desc:'On an approved warm reply, offers a 15-min Google Meet, sends the link, and confirms the meeting is real.',
+     st:'STANDBY', wf:['Offer a 15-min Google Meet','Collect email + send the link','A sent link ≠ a booked meeting','If unconfirmed, make a follow-up','Log the meeting'],
+     stats:[['0','booked'],['3','warm waiting'],['idle','status']],
+     rec:['Built — not launched yet','3 warm leads need a Meet link now','Fires on your first approved reply']},
+  fu:{code:'ECHO', role:'Follow-up', state:'standby', hue:[236,130,200], cell:3,
+     desc:'Runs the multi-touch follow-up cadence on non-replies — new angle, then a short nudge, stops the moment they reply.',
+     st:'STANDBY', wf:['Watch emails that got no reply','Wait 2 days → follow-up #2','Wait 3 more → short #3','Stop the moment they reply','Default follow-up = Friday'],
+     stats:[['0','sent'],['28','due now'],['idle','status']],
+     rec:['Built — not launched yet','28 manual follow-ups due this week','Cadence armed']}
+};
+const ORDER=['pr','en','pb','cw','sd','rt','bk','fu'];
+const STDOT={ready:'#5fe4ef',warm:'#f0c85a',standby:'#5b618f'};
+
+const LEADS=[
+  {i:'FP',g:'#fb7185',n:'Flickinger Painting',sub:'Painting · Atascadero',sg:'wants to book',
+   body:'Luisa wants to book a meeting — the hottest lead in the pipeline. Send the booking link and confirm the Meet (a sent link ≠ booked).'},
+  {i:'WP',g:'#5fe4ef',n:'Wallace Plumbing',sub:'Plumbing · SLO',sg:'said yes',
+   body:'Jordan said yes to setting up a time. Collecting his email to send the Google Meet link.'},
+  {i:'EF',g:'#f0c85a',n:'Exact Fit Coupling',sub:'Plumbing supply · SLO',sg:'wants mktg',
+   body:'Bobby Ryan wants marketing for Exact Fit. Info email sent; waiting on a Meet booking.'},
+  {i:'KC',g:'#3dd68c',n:'Kyle Company Roofing',sub:'Roofing · SLO',sg:'interested',
+   body:'Overcame the "never needed social media" objection. Got his email, sent info. Follow up Friday.'},
+  {i:'DL',g:'#a882ff',n:"Dan's Landscaping",sub:'Landscaping · SLO',sg:'warm',
+   body:'Gabby (office manager) says Dan has been interested in marketing. Warm — Dan to call back.'},
+  {i:'BO',g:'#568fff',n:"Brad's Overhead Doors",sub:'Garage Doors · Paso',sg:'July',
+   body:'Interested but wants to start mid-July. Got his email. Call back ~Jul 16.'}
+];
+
+/* ───────────────── PIXEL HQ RENDERER ───────────────── */
+(function(){
+  const VC=document.getElementById('hq'), vx=VC.getContext('2d');
+  const off=document.createElement('canvas'); off.width=320; off.height=200;
+  const c=off.getContext('2d');
+  const W=320,H=200, CW=W/3, CH=H/3;
+  function fit(){const r=VC.getBoundingClientRect();const dpr=Math.min(window.devicePixelRatio||1,1.5);
+    VC.width=Math.max(1,Math.round(r.width*dpr));VC.height=Math.max(1,Math.round(r.height*dpr));
+    vx.imageSmoothingEnabled=false;}
+  function px(x,y,w,h,col){c.fillStyle=col;c.fillRect(x|0,y|0,w|0,h|0);}
+  const rgb=(a,m=1)=>`rgb(${a[0]*m|0},${a[1]*m|0},${a[2]*m|0})`;
+
+  function room(col,row,a,f){
+    const x=col*CW, y=row*CH, w=CW, h=CH, hue=a.hue, on=a.state!=='standby';
+    // walls + back
+    px(x,y,w,h,'#0c0e1c');
+    px(x+2,y+2,w-4,h-4, rgb(hue, on?0.46:0.22));            // back wall
+    px(x+2,y+h-15,w-4,13, rgb(hue, on?0.7:0.32));            // floor
+    px(x+2,y+2,w-4,2, rgb(hue,1.0));                          // top trim light
+    // window/poster on back wall
+    px(x+8,y+8,12,9, rgb(hue, on?1.0:0.45)); px(x+9,y+9,10,2,'#0c0e1c');
+    // desk
+    const dx=x+w/2-15, dy=y+h-22;
+    px(dx,dy,30,3,'#3a2f25'); px(dx+1,dy+3,3,7,'#2a2118'); px(dx+26,dy+3,3,7,'#2a2118');
+    // monitor on desk
+    px(dx+19,dy-12,11,11,'#1a1d33'); px(dx+20,dy-11,9,7, on?rgb(hue,1):'#23263f');
+    if(on && f%2) px(dx+21,dy-10,7,1, rgb(hue,1.4)); // scanline blink
+    px(dx+23,dy-1,3,3,'#1a1d33');
+    // agent character at desk
+    const bob = (on && f%2)? -1 : 0;
+    char(dx+6, dy-13+bob, hue, a.state, f);
+    // status light
+    px(x+w-7,y+5,3,3, STDOT[a.state]);
+    if(a.state==='standby'){ // zzz
+      px(dx+11,dy-16-(f%4),1,1,'#5b618f'); px(dx+13,dy-19-((f+2)%4),1,1,'#5b618f');
+    }
+  }
+  function char(x,y,hue,state,f){
+    const dim = state==='standby'?0.55:1;
+    // hair/head
+    px(x,y,5,1, rgb([60,52,40],dim)); px(x,y+1,5,4, rgb([222,180,150],dim));
+    px(x+1,y+2,1,1,'#0c0e1c'); px(x+3,y+2,1,1,'#0c0e1c'); // eyes
+    // body (agent-colored shirt)
+    px(x,y+5,5,5, rgb(hue,dim*1.25));
+    // arms (typing toggle when active)
+    if(state!=='standby' && f%2){ px(x-1,y+6,1,2, rgb(hue,dim*.8)); px(x+5,y+6,1,2, rgb(hue,dim*.8)); }
+    else { px(x-1,y+7,1,2, rgb(hue,dim*.8)); px(x+5,y+7,1,2, rgb(hue,dim*.8)); }
+  }
+  function core(f){
+    const cx=W/2, cy=H/2;
+    // connection lines to the 8 rooms
+    c.strokeStyle='rgba(95,228,239,.16)'; c.lineWidth=1;
+    const cells=[[0,0],[1,0],[2,0],[2,1],[2,2],[1,2],[0,2],[0,1]];
+    c.beginPath(); for(const [cc,rr] of cells){ c.moveTo(cx,cy); c.lineTo(cc*CW+CW/2, rr*CH+CH/2); } c.stroke();
+    // core room
+    const x=CW, y=CH;
+    px(x,y,CW,CH,'#0c0e1c'); px(x+2,y+2,CW-4,CH-4,'rgba(40,80,150,.22)');
+    // pulsing AI orb (concentric diamonds)
+    const p = 1 + (f%6<3?1:0);
+    const ox=x+CW/2, oy=y+CH/2;
+    px(ox-7-p,oy-1,15+2*p,2,'rgba(95,228,239,.25)'); px(ox-1,oy-7-p,2,15+2*p,'rgba(95,228,239,.25)');
+    px(ox-5,oy-5,10,10,'rgba(95,228,239,.5)'); px(ox-3,oy-3,6,6,'#bff0ff'); px(ox-1,oy-2,2,4,'#fff');
+    // JARVIS label bar
+    px(x+2,y+CH-12,CW-4,10,'rgba(8,12,26,.7)');
+  }
+  // ambient data packets travelling the ring
+  const ring=[[0,0],[1,0],[2,0],[2,1],[2,2],[1,2],[0,2],[0,1]];
+  const pts=ring.map(([cc,rr])=>[cc*CW+CW/2, rr*CH+CH/2]);
+  const packets=[0,2.7,5.1].map(s=>({t:s}));
+  function drawPackets(){
+    for(const pk of packets){
+      pk.t=(pk.t+0.012)%pts.length;
+      const i=Math.floor(pk.t), n=(i+1)%pts.length, fr=pk.t-i;
+      const x=pts[i][0]+(pts[n][0]-pts[i][0])*fr, y=pts[i][1]+(pts[n][1]-pts[i][1])*fr;
+      px(x-1,y-1,2,2,'rgba(95,228,239,.9)');
+    }
+  }
+  // ── inside-a-room scene ──
+  function ringPx(x,y,d,col){px(x+1,y,d-2,1,col);px(x+1,y+d-1,d-2,1,col);px(x,y+1,1,d-2,col);px(x+d-1,y+1,1,d-2,col);}
+  function emblem(code,x,y,col){
+    if(code==='SCOUT'){ringPx(x,y,9,col);px(x+8,y+8,5,2,col);}
+    else if(code==='ORACLE'){px(x,y+2,13,7,col);px(x+4,y+4,5,3,'#0c0e1c');px(x+5,y+5,3,1,col);}
+    else if(code==='FORGE'){px(x+5,y,3,8,col);px(x+1,y+8,11,3,col);}
+    else if(code==='SCRIBE'){px(x+9,y,2,9,col);px(x,y+9,10,2,col);}
+    else if(code==='RELAY'){px(x,y+5,13,1,col);px(x+1,y+3,9,1,col);px(x+2,y+1,5,1,col);px(x+10,y+5,3,3,col);}
+    else if(code==='SENTRY'){px(x+2,y,9,3,col);px(x,y+3,13,4,col);px(x+3,y+7,7,3,col);px(x+5,y+10,3,2,col);}
+    else if(code==='CLOSER'){px(x,y,13,13,col);px(x+2,y+3,9,8,'#0c0e1c');px(x+4,y+7,2,2,col);px(x+6,y+5,2,2,col);px(x+8,y+7,2,2,col);}
+    else if(code==='ECHO'){ringPx(x,y,11,col);px(x+5,y+2,1,4,col);px(x+5,y+5,4,1,col);}
+  }
+  function bigChar(x,y,hue,f,state){
+    const act=(state!=='standby'&&f%2),bob=act?-1:0; y+=bob;
+    px(x+2,y,8,2,rgb([70,60,46])); px(x+1,y+2,10,7,rgb([235,190,158]));
+    px(x+3,y+4,2,2,'#0c0e1c'); px(x+7,y+4,2,2,'#0c0e1c'); px(x+4,y+7,4,1,rgb([200,120,110]));
+    px(x,y+9,12,11,rgb(hue,1.2)); px(x+2,y+9,8,2,rgb(hue,1.6));
+    px(x-2,y+(act?10:12),3,4,rgb(hue)); px(x+11,y+(act?10:12),3,4,rgb(hue));
+    if(state==='standby'){px(x+13,y-2-(f%4),2,2,'#8089c0');px(x+16,y-6-((f+2)%4),2,2,'#8089c0');}
+  }
+  function roomScene(a,f){
+    const hue=a.hue,on=a.state!=='standby';
+    px(0,0,W,148,rgb(hue,on?0.5:0.27)); px(0,8,W,3,rgb(hue,1.0));
+    for(let fy=148;fy<H;fy+=8)for(let fx=0;fx<W;fx+=8){const t=((fx/8+fy/8)|0)%2;px(fx,fy,8,8,rgb(hue,t?0.36:0.22));}
+    px(0,148,W,2,rgb(hue,0.95));
+    px(22,26,70,46,'#0c0e1c'); px(25,29,64,40,'#10204a'); px(25,29,64,16,'#21368a');
+    for(const s of [[34,40],[52,36],[70,46],[80,55],[44,58],[60,50]])px(s[0],s[1],1,1,'#cfe0ff');
+    px(57,29,2,40,'#0c0e1c'); px(25,49,64,2,'#0c0e1c');
+    px(214,26,72,48,'#0c0e1c'); px(217,29,66,42,rgb(hue,0.75)); px(217,29,66,2,rgb(hue,1.3));
+    emblem(a.code,236,38,rgb(hue,1.7));
+    px(298,121,9,3,'#0c0e1c'); px(300,109,5,12,rgb([170,90,60])); px(297,100,11,10,rgb([60,195,120])); px(300,95,5,6,rgb([90,225,150]));
+    px(96,162,128,32,rgb(hue,0.5)); px(102,166,116,24,rgb(hue,0.78));
+    px(118,118,84,8,'#4a3a2a'); px(122,126,8,30,'#332618'); px(190,126,8,30,'#332618'); px(118,118,84,2,'#5e4a34');
+    px(150,92,40,26,'#15182e'); px(153,95,34,18,on?rgb(hue,0.95):'#20243f');
+    if(on){for(let i=0;i<4;i++)px(156,98+i*4,((f+i)%5)*5+6,2,rgb(hue,1.6));}
+    px(166,118,8,4,'#15182e'); px(160,122,20,2,'#15182e');
+    bigChar(120,86,hue,f,a.state);
+  }
+  let frame=0, last=0, view='hq', active=null;
+  function draw(){
+    c.clearRect(0,0,W,H);
+    px(0,0,W,H,'#06070f');
+    if(view==='room'&&active){ roomScene(AG[active],frame); }
+    else{
+      c.strokeStyle='rgba(70,80,150,.12)'; for(let gx=0;gx<=W;gx+=CW){c.beginPath();c.moveTo(gx,0);c.lineTo(gx,H);c.stroke();}
+      ORDER.forEach(k=>{const a=AG[k];room(a.cell%3, (a.cell/3)|0, a, frame);});
+      core(frame); drawPackets();
+    }
+    vx.clearRect(0,0,VC.width,VC.height);
+    vx.imageSmoothingEnabled=false;
+    vx.drawImage(off,0,0,W,H,0,0,VC.width,VC.height);
+  }
+  function loop(ts){ if(ts-last>82){ last=ts; frame++; draw(); } requestAnimationFrame(loop); }
+  window.addEventListener('resize',()=>{fit();draw();});
+  fit(); draw(); requestAnimationFrame(loop);
+
+  // view control: go inside a room / come back
+  const rv=document.getElementById('rv');
+  window.enterRoom=function(k){const a=AG[k];if(!a)return;view='room';active=k;
+    document.getElementById('rvtitle').textContent=a.code+' · '+a.role;
+    const stl=document.getElementById('rvst');stl.textContent=a.st;stl.style.color=STDOT[a.state];stl.style.borderColor=STDOT[a.state];
+    document.getElementById('rvbot').innerHTML='<div class="cur">'+a.desc+'</div><div class="wf">'+a.wf.map(w=>'<span>'+w+'</span>').join('')+'</div><div class="kv">'+a.stats.map(s=>'<b>'+s[0]+'</b> <i>'+s[1]+'</i>').join('')+'</div>';
+    rv.classList.add('on'); const g=document.getElementById('grid'); if(g)g.style.display='none';
+    VC.style.opacity=0; requestAnimationFrame(()=>{VC.style.opacity=1;}); draw();};
+  window.exitRoom=function(){view='hq';active=null;rv.classList.remove('on');
+    const g=document.getElementById('grid'); if(g)g.style.display='';
+    VC.style.opacity=0; requestAnimationFrame(()=>{VC.style.opacity=1;}); draw();};
+})();
+
+/* ───────────────── OVERLAY ROOMS (labels + click) ───────────────── */
+(function(){
+  const grid=$('#grid'); const cells=new Array(9).fill(null);
+  ORDER.forEach(k=>{cells[AG[k].cell]={k};});
+  for(let i=0;i<9;i++){
+    const d=document.createElement('div'); d.className='cell';
+    if(i===4){ d.classList.add('core'); d.innerHTML='<span class="tag">JARVIS · CORE</span>'; d.onclick=playBriefing; }
+    else if(cells[i]){ const a=AG[cells[i].k];
+      d.innerHTML=`<span class="tag"><b style="background:${STDOT[a.state]}"></b>${a.code} <i>${a.role}</i></span>`;
+      d.onclick=()=>window.enterRoom(cells[i].k);
+    }
+    grid.appendChild(d);
+  }
+})();
+
+/* ───────────────── WARM LEADS ───────────────── */
+(function(){
+  $('#warm').innerHTML=LEADS.map((l,i)=>
+    `<div class="lead" data-i="${i}"><span class="av" style="background:${l.g}">${l.i}</span>`+
+    `<span class="nm">${l.n}<s>${l.sub}</s></span><span class="sg">${l.sg}</span></div>`).join('');
+  $('#warm').querySelectorAll('.lead').forEach(el=>el.onclick=()=>openLead(LEADS[+el.dataset.i]));
+})();
+
+/* ───────────────── DRAWER ───────────────── */
+const scrim=$('#scrim'), draw=$('#draw'), drawin=$('#drawin');
+function openDraw(html){drawin.innerHTML='<span class="x" onclick="closeDraw()">✕</span>'+html;scrim.classList.add('on');draw.classList.add('on');}
+function closeDraw(){scrim.classList.remove('on');draw.classList.remove('on');}
+scrim.onclick=closeDraw;
+function openAgent(k){const a=AG[k];
+  openDraw(`<div class="code" style="color:${rgbs(a.hue)}">${a.code}</div><div class="role">${a.role}</div>`+
+    `<span class="st" style="border-color:${STDOT[a.state]};color:${STDOT[a.state]}">${a.st}</span>`+
+    `<p>${a.desc}</p>`+
+    `<div class="sec">Workflow</div><ul class="wf">${a.wf.map(w=>`<li>${w}</li>`).join('')}</ul>`+
+    `<div class="sec">Stats</div><div class="kv">${a.stats.map(s=>`<div><div class="v">${s[0]}</div><div class="k">${s[1]}</div></div>`).join('')}</div>`+
+    `<div class="sec">Recent</div>${a.rec.map(r=>`<div class="rec">${r}</div>`).join('')}`);}
+function openLead(l){
+  openDraw(`<div class="code" style="color:${l.g}">${l.i}</div><div class="role">${l.n}</div>`+
+    `<span class="st" style="border-color:${l.g};color:${l.g}">${l.sg}</span>`+
+    `<p>${l.body}</p><div class="sec">Niche</div><p style="color:var(--ink2)">${l.sub}</p>`);}
+const rgbs=a=>`rgb(${a[0]},${a[1]},${a[2]})`;
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDraw();});
+
+/* ───────────────── CLOCK ───────────────── */
+setInterval(()=>{$('#clock').textContent=new Date().toLocaleTimeString('en-US',{hour12:false})+' PT';},1000);
+
+/* ───────────────── JARVIS (voice + conversation) ───────────────── */
+const cap=$('#cap'), ask=$('#ask'), micB=$('#mic'), spkB=$('#spk');
+let voiceOn=true, listening=false, rec=null, convo=[];
+spkB.onclick=()=>{voiceOn=!voiceOn;spkB.classList.toggle('on',voiceOn);spkB.textContent=voiceOn?'VOICE':'MUTED';if(!voiceOn)speechSynthesis.cancel();};
+function setCap(t,say){cap.textContent=t;cap.classList.toggle('say',!!say);}
+function pickVoice(){const v=speechSynthesis.getVoices();return v.find(x=>/daniel/i.test(x.name))||v.find(x=>/en-GB/i.test(x.lang)&&/male|daniel|arthur|george/i.test(x.name))||v.find(x=>/en-GB/i.test(x.lang))||v.find(x=>/en/i.test(x.lang))||v[0];}
+function speak(t){if(!voiceOn||!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);const v=pickVoice();if(v)u.voice=v;u.rate=.94;u.pitch=.86;speechSynthesis.speak(u);}
+function respond(t){setCap(t,true);speak(t);}
+
+function playBriefing(){
+  const recap="Good evening, sir. Your pipeline holds 74 leads across San Luis Obispo County — 8 warm, 28 in active follow-up. The hottest is Flickinger Painting; Luisa would like to book. Wallace Plumbing and Exact Fit are waiting on a Meet link. No meetings booked yet, no clients signed — you are brand new. The fleet is built and on standby; SCOUT has already sourced your first leads. The work today, sir, is the phone.";
+  respond(recap);
+}
+function scripted(q){
+  q=q.toLowerCase();
+  if(/recap|brief|good evening|status|where are we|agents?/.test(q))return playBriefing();
+  if(/warm|hot|lead/.test(q))return respond("Eight warm, sir. Flickinger wants to book; Wallace and Exact Fit await a Meet link; Kyle, Dan’s and Brad’s are interested. Flickinger first.");
+  if(/scout|prospect/.test(q))return respond("SCOUT has sourced 74 leads, sir — thirteen on its first run. The headless version is coded and awaits a Yelp key.");
+  if(/hello|hey|hi|jarvis/.test(q))return respond("At your service, sir.");
+  if(/thank/.test(q))return respond("A pleasure, sir.");
+  return respond("Noted, sir. The fleet stands ready — say ‘briefing’ for the full picture.");
+}
+async function askJarvis(text){
+  if(!text)return; ask.value=''; setCap('“'+text+'”');
+  convo.push({role:'user',content:text});
+  try{
+    const r=await fetch('/.netlify/functions/jarvis',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({messages:convo})});
+    if(!r.ok)throw 0; const d=await r.json(); const t=d.text||'';
+    if(!t)throw 0; convo.push({role:'assistant',content:t}); respond(t);
+  }catch(_){ convo.pop(); scripted(text); }
+}
+ask.addEventListener('keydown',e=>{if(e.key==='Enter')askJarvis(ask.value.trim());});
+
+/* speech-to-text */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+function startListen(){
+  if(!SR){setCap('Speech recognition not supported — type instead.');return;}
+  if(listening)return; listening=true; micB.classList.add('on'); setCap('Listening…');
+  rec=new SR(); rec.lang='en-US'; rec.interimResults=true; rec.continuous=false;
+  rec.onresult=ev=>{let t='';for(const r of ev.results)t+=r[0].transcript;ask.value=t;setCap('“'+t+'”');};
+  rec.onend=()=>{listening=false;micB.classList.remove('on');const t=ask.value.trim();if(t)askJarvis(t);};
+  rec.onerror=()=>{listening=false;micB.classList.remove('on');};
+  try{rec.start();}catch(_){listening=false;micB.classList.remove('on');}
+}
+micB.onclick=startListen;
+document.addEventListener('keydown',e=>{if(e.code==='Space'&&document.activeElement!==ask){e.preventDefault();startListen();}});
+
+/* clap-to-listen (throttled, cheap) */
+if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
+  navigator.mediaDevices.getUserMedia({audio:true}).then(s=>{try{
+    const AC=window.AudioContext||window.webkitAudioContext,ac=new AC(),src=ac.createMediaStreamSource(s),an=ac.createAnalyser();
+    an.fftSize=512;src.connect(an);const d=new Uint8Array(an.fftSize);let prev=0,lastC=0,lp=0;
+    (function loop(){const now=performance.now();if(now-lp>60){lp=now;an.getByteTimeDomainData(d);let pk=0;for(let i=0;i<d.length;i++){const v=Math.abs(d[i]-128);if(v>pk)pk=v;}if(pk>72&&prev<36&&now-lastC>900){lastC=now;startListen();}prev=pk;}requestAnimationFrame(loop);})();
+  }catch(_){}}).catch(()=>{});
+}
+if(window.speechSynthesis)speechSynthesis.onvoiceschanged=()=>{};
+</script>
+</body>
+</html>
