@@ -130,7 +130,7 @@
   </header>
 
   <div class="stats">
-    <div class="stat pf c0"><div class="n" id="s-leads">74</div><div class="l">Leads</div></div>
+    <div class="stat pf c0"><div class="n" id="s-leads">104</div><div class="l">Leads</div></div>
     <div class="stat pf c1"><div class="n">8</div><div class="l">Warm</div></div>
     <div class="stat pf c2"><div class="n">28</div><div class="l">Follow-ups</div></div>
     <div class="stat pf c3"><div class="n">0</div><div class="l">Meetings</div></div>
@@ -193,10 +193,10 @@ const $=s=>document.querySelector(s);
 const AG = {
   pr:{code:'SCOUT', role:'Prospector', state:'ready', hue:[95,224,239], cell:0,
      desc:'Finds local businesses by niche + geo that aren’t running Meta ads, dedupes against the CRM, and writes new leads in.',
-     st:'READY · 74 leads sourced',
-     wf:['Pull the next territory (SLO County first)','Find local service businesses','Drop anyone already in the CRM','Keep 10+ reviews, not running Meta ads','Capture name / phone / niche → ORACLE'],
-     stats:[['13','last run'],['74','in CRM'],['SLO','territory']],
-     rec:['First run 6/17 → +13 leads (HVAC, pools, pest, electrical)','Cloud version coded — pending Yelp key + setup','Browser version needs you present; headless one doesn’t']},
+     st:'LIVE · 104 in CRM',
+     wf:['Pull the next territory (SLO County first)','Find local service businesses','Drop anyone already in the CRM','Keep 10–250 reviews, has a phone','Capture name / phone / niche → ORACLE'],
+     stats:[['30','last run'],['104','in CRM'],['daily','7am PT']],
+     rec:['LIVE on Google Places — runs every morning ~7am','Last run added 30 (HVAC + electrical)','104 leads in CRM · deduped + giant-filtered']},
   en:{code:'ORACLE', role:'Enricher', state:'standby', hue:[86,143,255], cell:1,
      desc:'Finds the owner / decision-maker, a deliverable email, and confirms the business isn’t already advertising on Meta.',
      st:'STANDBY', wf:['Find a real, deliverable email','Identify the owner / decision-maker','Check Facebook Ads Library','Confirm 10+ reviews','Flag qualified leads → FORGE'],
@@ -452,14 +452,14 @@ function speak(t){if(!voiceOn||!window.speechSynthesis)return;speechSynthesis.ca
 function respond(t){setCap(t,true);speak(t);}
 
 function playBriefing(){
-  const recap="Good evening, sir. Your pipeline holds 74 leads across San Luis Obispo County — 8 warm, 28 in active follow-up. The hottest is Flickinger Painting; Luisa would like to book. Wallace Plumbing and Exact Fit are waiting on a Meet link. No meetings booked yet, no clients signed — you are brand new. The fleet is built and on standby; SCOUT has already sourced your first leads. The work today, sir, is the phone.";
+  const recap="Good evening, sir. Your pipeline holds 104 leads across San Luis Obispo County — 8 warm, 28 in active follow-up. The hottest is Flickinger Painting; Luisa would like to book. Wallace Plumbing and Exact Fit are waiting on a Meet link. No meetings booked yet, no clients signed — you are brand new. SCOUT now runs every morning, filling your pipeline on its own. The work today, sir, is the phone.";
   respond(recap);
 }
 function scripted(q){
   q=q.toLowerCase();
   if(/recap|brief|good evening|status|where are we|agents?/.test(q))return playBriefing();
   if(/warm|hot|lead/.test(q))return respond("Eight warm, sir. Flickinger wants to book; Wallace and Exact Fit await a Meet link; Kyle, Dan’s and Brad’s are interested. Flickinger first.");
-  if(/scout|prospect/.test(q))return respond("SCOUT has sourced 74 leads, sir — thirteen on its first run. The headless version is coded and awaits a Yelp key.");
+  if(/scout|prospect/.test(q))return respond("SCOUT is live, sir — 104 leads in the CRM, and it adds more every morning entirely on its own.");
   if(/hello|hey|hi|jarvis/.test(q))return respond("At your service, sir.");
   if(/thank/.test(q))return respond("A pleasure, sir.");
   return respond("Noted, sir. The fleet stands ready — say ‘briefing’ for the full picture.");
