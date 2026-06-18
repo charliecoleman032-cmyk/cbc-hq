@@ -197,11 +197,11 @@ const AG = {
      wf:['Pull the next territory (SLO County first)','Find local service businesses','Drop anyone already in the CRM','Keep 10–250 reviews, has a phone','Capture name / phone / niche → ORACLE'],
      stats:[['30','last run'],['104','in CRM'],['daily','7am PT']],
      rec:['LIVE on Google Places — runs every morning ~7am','Last run added 30 (HVAC + electrical)','104 leads in CRM · deduped + giant-filtered']},
-  en:{code:'ORACLE', role:'Enricher', state:'standby', hue:[86,143,255], cell:1,
-     desc:'Finds the owner / decision-maker, a deliverable email, and confirms the business isn’t already advertising on Meta.',
-     st:'STANDBY', wf:['Find a real, deliverable email','Identify the owner / decision-maker','Check Facebook Ads Library','Confirm 10+ reviews','Flag qualified leads → FORGE'],
-     stats:[['0','enriched'],['—','bounces'],['idle','status']],
-     rec:['Built — not launched yet','Next: owner + email for rows 63–75','FB-ads check = its own mini-build']},
+  en:{code:'ORACLE', role:'Enricher', state:'ready', hue:[86,143,255], cell:1,
+     desc:'Finds a deliverable email for each lead by scraping its website, and writes it to the CRM.',
+     st:'LIVE · 45 emails on file', wf:['Look up the lead’s website via Places','Fetch the site + contact page','Extract the best real email','Write it to the CRM','Hand enriched leads → FORGE'],
+     stats:[['45','emails'],['~50%','hit rate'],['live','status']],
+     rec:['LIVE — scrapes a real email from each lead’s site','45 leads now have an email on file','Run “Enrich emails” from the SCOUT menu']},
   pb:{code:'FORGE', role:'Plan Builder', state:'standby', hue:[244,176,64], cell:2,
      desc:'Builds a custom Meta ads growth plan per business — budget tier, audience, three creative angles, honest CPL.',
      st:'STANDBY', wf:['Research the business + competitors','Pick a budget tier + audience','Write 3 creative angles for the niche','Project a realistic cost-per-lead','Build the plan doc → SCRIBE'],
@@ -468,7 +468,7 @@ async function askJarvis(text){
   if(!text)return; ask.value=''; setCap('“'+text+'”');
   convo.push({role:'user',content:text});
   try{
-    const r=await fetch('/.netlify/functions/jarvis',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({messages:convo})});
+    const r=await fetch('https://cbc-jarvis.charlie-d44.workers.dev',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({messages:convo})});
     if(!r.ok)throw 0; const d=await r.json(); const t=d.text||'';
     if(!t)throw 0; convo.push({role:'assistant',content:t}); respond(t);
   }catch(_){ convo.pop(); scripted(text); }
