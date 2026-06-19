@@ -3,124 +3,188 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CBC Media · HQ</title>
+<title>CBC Media · DECK//SLO</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0a0b16; --panel:#13152b; --panel2:#191c38; --line:#2c3158;
-    --ink:#eaf0ff; --ink2:#99a0d0; --ink3:#5b618f; --acc:#5fe4ef; --gold:#f0c85a;
+    --bg:#070a12; --panel:#0a0e16; --chip:#0b0f18; --card:#0d121e;
+    --cy:#5fe4ef; --cy2:#2b8b95; --mg:#ff3d81; --am:#f5b942; --gn:#43e0a0;
+    --ink:#e8f4f6; --mut:#aeb9c4; --dim:#5b6a7d; --line:#163049; --line2:#0f2238;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html,body{background:var(--bg);color:var(--ink);font-family:'VT323',monospace}
+  html,body{height:100%}
   body{
-    min-height:100vh;padding:14px;
-    background-image:radial-gradient(circle at 50% -10%,rgba(58,78,190,.5),transparent 60%),
-                     radial-gradient(circle at 90% 110%,rgba(150,70,190,.32),transparent 55%);
-    image-rendering:pixelated;
+    background:var(--bg);color:var(--ink);
+    font-family:'JetBrains Mono',ui-monospace,monospace;
+    overflow:hidden;
+    background-image:
+      radial-gradient(1200px 600px at 50% -20%,rgba(40,120,140,.14),transparent 60%),
+      radial-gradient(900px 500px at 95% 120%,rgba(150,30,80,.10),transparent 55%);
   }
-  .wrap{max-width:1080px;margin:0 auto}
-  /* ── pixel-frame helper: sharp double border, zero blur ── */
-  .pf{border:2px solid var(--line);box-shadow:0 0 0 2px var(--bg),0 0 0 4px #1c2046;background:var(--panel)}
+  .mono{font-family:'JetBrains Mono',monospace}
+  .disp{font-family:'Chakra Petch','JetBrains Mono',sans-serif}
 
-  /* ── top bar ── */
-  .bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;margin-bottom:12px}
-  .logo{font-family:'Press Start 2P';font-size:13px;letter-spacing:1px;color:var(--ink)}
-  .logo b{color:var(--acc)} .logo span{color:var(--ink3)}
-  .pills{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .pill{font-size:17px;line-height:1;padding:6px 9px;border:2px solid var(--line);background:#0e1024;color:var(--ink2);letter-spacing:.5px}
-  .pill b{color:var(--acc)} .pill .dz{color:var(--gold)}
-  .pill.gold{color:var(--gold)} #clock{color:var(--ink);min-width:78px;text-align:center}
+  /* ── global HUD overlays ── */
+  .scan{position:fixed;inset:0;z-index:80;pointer-events:none;
+    background:repeating-linear-gradient(0deg,rgba(95,228,239,.035) 0 1px,transparent 1px 3px);
+    animation:scandrift 8s linear infinite}
+  @keyframes scandrift{to{background-position:0 3px}}
+  .vig{position:fixed;inset:0;z-index:81;pointer-events:none;
+    box-shadow:inset 0 0 240px rgba(0,0,0,.65),inset 0 0 60px rgba(0,0,0,.4)}
+  .brk{position:fixed;width:26px;height:26px;z-index:82;pointer-events:none;border:1.5px solid var(--cy);opacity:.5}
+  .brk.tl{top:10px;left:10px;border-right:0;border-bottom:0}
+  .brk.tr{top:10px;right:10px;border-left:0;border-bottom:0}
+  .brk.bl{bottom:10px;left:10px;border-right:0;border-top:0}
+  .brk.br{bottom:10px;right:10px;border-left:0;border-top:0}
 
-  /* ── stat chips ── */
-  .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px}
-  .stat{padding:10px 12px;text-align:center}
-  .stat .n{font-family:'Press Start 2P';font-size:18px;color:var(--ink)}
-  .stat .l{font-size:16px;color:var(--ink2);letter-spacing:.5px;margin-top:6px;text-transform:uppercase}
-  .stat.c0 .n{color:var(--acc)} .stat.c1 .n{color:#fb7185} .stat.c2 .n{color:#f0c85a}
-  .stat.c3 .n{color:var(--ink3)} .stat.c4 .n{color:var(--ink3)}
+  /* ── chassis grid ── */
+  .deck{position:relative;height:100vh;display:grid;
+    grid-template-rows:54px 1fr 34px minmax(220px,30vh);gap:0;padding:18px 22px}
 
-  /* ── main grid: stage + side ── */
-  .main{display:grid;grid-template-columns:1fr 286px;gap:12px;align-items:start}
-  @media(max-width:860px){.main{grid-template-columns:1fr}}
+  /* ── top rail ── */
+  .top{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:8px}
+  .wm{font-family:'Chakra Petch';font-weight:700;font-size:20px;letter-spacing:.14em;color:var(--cy)}
+  .wm b{color:var(--mg)}
+  .wm .sub{display:block;font-family:'JetBrains Mono';font-weight:400;font-size:10px;letter-spacing:.18em;color:var(--dim);margin-top:2px}
+  .ctr{text-align:center}
+  #clock{font-size:21px;font-weight:500;letter-spacing:.06em;color:var(--ink);white-space:nowrap}
+  .ctr{min-width:180px}
+  .ctr .shift{font-size:10px;letter-spacing:.18em;color:var(--dim);margin-top:1px}
+  .vitals{display:flex;gap:7px}
+  .vital{font-size:11px;letter-spacing:.06em;color:var(--mut);border:1px solid var(--line);padding:5px 8px;white-space:nowrap}
+  .vital b{color:var(--cy);font-weight:700}
+  .vital.zero b{color:var(--mut)}
 
-  /* ── pixel HQ stage ── */
-  .stage{position:relative;width:100%;aspect-ratio:320/200;overflow:hidden;background:#06070f}
-  #hq{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
-  .scan{position:absolute;inset:0;pointer-events:none;opacity:.16;
-        background:repeating-linear-gradient(0deg,#000 0 1px,transparent 1px 3px)}
-  .vig{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 60px rgba(0,0,0,.6)}
-  .grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr)}
-  .cell{position:relative;cursor:pointer;display:flex;align-items:flex-end;justify-content:center}
-  .cell:hover{box-shadow:inset 0 0 0 2px rgba(95,228,239,.7)}
-  .tag{font-size:15px;line-height:1;letter-spacing:.5px;padding:3px 6px;margin-bottom:5px;
-       background:rgba(6,8,18,.84);border:1px solid var(--line);color:var(--ink);white-space:nowrap}
-  .tag i{font-style:normal;color:var(--ink2);font-size:13px}
-  .tag b{display:inline-block;width:6px;height:6px;margin-right:5px;vertical-align:1px}
-  .cell.core .tag{border-color:var(--acc);color:var(--acc)}
+  /* ── main stage ── */
+  .stage{position:relative;overflow:hidden}
+  #trace{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+  .legend{position:absolute;left:0;bottom:4px;z-index:3;font-size:10px;color:var(--dim);letter-spacing:.08em}
+  .legend b{color:var(--mg)} .legend i{color:var(--cy);font-style:normal}
+  .scanbar{position:absolute;left:0;right:0;height:60px;z-index:2;pointer-events:none;
+    background:linear-gradient(180deg,transparent,rgba(95,228,239,.06),transparent);
+    animation:sweep 12s linear infinite}
+  @keyframes sweep{0%{transform:translateY(-80px)}100%{transform:translateY(calc(100% + 20px))}}
 
-  /* ── side column ── */
-  .side{display:flex;flex-direction:column;gap:12px}
-  .card{padding:12px 13px}
-  .h{font-family:'Press Start 2P';font-size:10px;color:var(--ink2);letter-spacing:1px;margin-bottom:11px;text-transform:uppercase}
-  .lead{display:flex;align-items:center;gap:8px;padding:7px 6px;border-bottom:1px solid #1c2042;cursor:pointer;font-size:18px}
-  .lead:last-child{border-bottom:0} .lead:hover{background:#191c38}
-  .lead .av{width:22px;height:22px;flex:none;display:grid;place-items:center;font-size:12px;font-family:'Press Start 2P';color:#0a0b16}
-  .lead .nm{flex:1;line-height:1.05;color:var(--ink)} .lead .nm s{display:block;text-decoration:none;font-size:14px;color:var(--ink3)}
-  .lead .sg{font-size:13px;color:var(--gold);text-align:right;max-width:74px;line-height:1}
+  .bus{position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:space-between;
+    gap:14px;padding:30px 6px 44px}
+  .col{flex:1;display:flex;flex-direction:column;align-items:center;min-width:0}
+  .col.lift{margin-bottom:54px} .col.drop{margin-top:54px}
 
-  /* ── jarvis console ── */
-  .console{margin-top:12px;padding:12px 14px}
-  .cap{font-size:19px;color:var(--acc);min-height:24px;letter-spacing:.4px;margin-bottom:10px}
+  /* ── chip node ── */
+  .chip{position:relative;width:100%;max-width:188px;background:var(--chip);
+    border:1px solid var(--line);padding:9px 10px 11px;cursor:pointer;
+    transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease}
+  .chip::before,.chip::after{content:"";position:absolute;width:9px;height:9px;border:1.5px solid var(--cy);opacity:.55}
+  .chip::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+  .chip::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+  .chip:hover{transform:translateY(-3px);border-color:var(--cy);box-shadow:0 0 0 1px rgba(95,228,239,.25),0 14px 30px -16px rgba(95,228,239,.5)}
+  .chip.standby{border-color:var(--line2)}
+  .chip.standby::before,.chip.standby::after{border-color:var(--am);opacity:.4}
+  .pins{position:absolute;left:0;right:0;bottom:-12px;height:12px;display:flex;justify-content:space-around;padding:0 14px}
+  .pins i{width:1px;height:12px;background:linear-gradient(var(--cy),transparent);opacity:.5}
+  .chip.standby .pins i{background:linear-gradient(var(--am),transparent);opacity:.3}
+
+  .chead{display:flex;align-items:center;gap:6px;margin-bottom:2px}
+  .led{width:7px;height:7px;border-radius:50%;flex:none;background:var(--cy);box-shadow:0 0 7px var(--cy);animation:breathe 1.3s ease-in-out infinite}
+  .chip.standby .led{background:var(--am);box-shadow:none;animation:none;opacity:.7}
+  @keyframes breathe{0%,100%{opacity:.45}50%{opacity:1}}
+  .cname{font-family:'Chakra Petch';font-weight:600;font-size:15px;letter-spacing:.08em;color:var(--ink);flex:1;line-height:1}
+  .cstat{font-size:8px;letter-spacing:.14em;color:var(--cy)}
+  .chip.standby .cstat{color:var(--am)}
+  .pid{font-size:8px;color:var(--dim);letter-spacing:.1em;margin-bottom:6px}
+  .die{position:relative;width:100%;height:60px;background:#06080f;border:1px solid var(--line2);overflow:hidden}
+  .die canvas{display:block;width:100%;height:100%}
+  .tel{margin-top:7px;display:flex;flex-direction:column;gap:2px}
+  .tel div{font-size:9px;color:var(--mut);letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tel div span{color:var(--dim)}
+  .tel .thru{color:var(--cy)}
+  .hand{margin-top:6px;border-top:1px dashed var(--line2);padding-top:5px;font-size:8.5px;color:var(--dim);letter-spacing:.1em}
+
+  /* SCRIBE daughter chip nested in RELAY */
+  .daughter{margin-top:8px;width:100%;max-width:188px;background:#080b13;border:1px solid var(--line2);
+    border-left:2px solid var(--cy);padding:6px 8px;cursor:pointer;transition:border-color .14s}
+  .daughter:hover{border-color:var(--cy)}
+  .dhead{display:flex;align-items:center;gap:5px;margin-bottom:4px}
+  .dhead .led{width:5px;height:5px}
+  .dname{font-family:'Chakra Petch';font-weight:600;font-size:11px;letter-spacing:.08em;color:var(--mut);flex:1}
+  .dtag{font-size:7.5px;color:var(--dim);letter-spacing:.12em}
+  .ddie{width:100%;height:30px;background:#06080f;border:1px solid var(--line2);overflow:hidden}
+  .ddie canvas{display:block;width:100%;height:100%}
+  .relaywrap{display:flex;flex-direction:column;align-items:center;width:100%}
+
+  /* ── shift ribbon ── */
+  .ribbon{position:relative;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:2px}
+  #rib{position:absolute;inset:0;width:100%;height:100%}
+  .ribtag{position:absolute;left:0;top:50%;transform:translateY(-50%);font-size:9px;letter-spacing:.16em;color:var(--dim);padding-left:2px;background:var(--bg);padding-right:8px;z-index:2}
+
+  /* ── bottom rail ── */
+  .bottom{display:grid;grid-template-columns:1.62fr 1fr;gap:16px;padding-top:12px;min-height:0}
+  .term{display:flex;flex-direction:column;min-height:0;border:1px solid var(--line);background:var(--panel)}
+  .log{height:26px;display:flex;align-items:center;border-bottom:1px solid var(--line2);padding:0 10px;overflow:hidden}
+  .log .dot{width:5px;height:5px;border-radius:50%;background:var(--mg);box-shadow:0 0 6px var(--mg);margin-right:9px;flex:none}
+  #logline{font-size:10.5px;color:var(--cy);letter-spacing:.04em;white-space:nowrap}
+  .core{flex:1;display:flex;flex-direction:column;padding:10px 12px;min-height:0}
+  .corehead{display:flex;align-items:center;gap:9px;margin-bottom:7px}
+  #jcore{width:40px;height:40px;flex:none}
+  .cap{flex:1;font-size:13px;color:var(--cy);line-height:1.35;min-height:18px;max-height:54px;overflow:hidden}
   .cap.say{color:var(--ink)}
-  .cmd{display:flex;gap:8px;align-items:center}
-  .cmd .pr{color:var(--acc);font-size:20px}
-  #ask{flex:1;background:#0e1024;border:2px solid var(--line);color:var(--ink);font-family:'VT323';font-size:19px;padding:8px 10px;outline:none}
-  #ask:focus{border-color:var(--acc)}
-  .btn{font-family:'VT323';font-size:17px;padding:8px 12px;border:2px solid var(--line);background:#0e1024;color:var(--ink2);cursor:pointer;letter-spacing:.5px}
-  .btn:hover{color:var(--ink);border-color:var(--acc)} .btn.on{color:#0a0b16;background:var(--acc);border-color:var(--acc)}
-  .hint{font-size:14px;color:var(--ink3);margin-top:8px;letter-spacing:.5px}
+  .cmd{display:flex;align-items:center;gap:8px;border-top:1px solid var(--line2);padding-top:9px}
+  .prompt{color:var(--cy);font-size:13px;letter-spacing:.04em;flex:none}
+  #ask{flex:1;background:transparent;border:0;color:var(--ink);font-family:'JetBrains Mono';font-size:13px;outline:none;caret-color:var(--mg)}
+  #ask::placeholder{color:var(--dim)}
+  .tbtn{font-family:'JetBrains Mono';font-size:10px;letter-spacing:.1em;padding:6px 9px;border:1px solid var(--line);background:#06080f;color:var(--mut);cursor:pointer;transition:all .12s}
+  .tbtn:hover{border-color:var(--cy);color:var(--cy)}
+  .tbtn.on{background:var(--cy);color:#04121a;border-color:var(--cy)}
+  .tbtn.listening{border-color:var(--mg);color:var(--mg);animation:breathe 1s infinite}
+  .hint{font-size:9px;color:var(--dim);letter-spacing:.08em;margin-top:7px}
+
+  .signals{display:flex;flex-direction:column;min-height:0;border:1px solid var(--line);background:var(--panel)}
+  .sighead{font-family:'Chakra Petch';font-weight:600;font-size:11px;letter-spacing:.18em;color:var(--mut);padding:9px 12px;border-bottom:1px solid var(--line2);display:flex;justify-content:space-between;align-items:center}
+  .sighead s{text-decoration:none;font-family:'JetBrains Mono';font-size:9px;color:var(--mg)}
+  .siglist{overflow-y:auto;flex:1}
+  .sig{display:flex;align-items:center;gap:9px;padding:8px 12px;border-bottom:1px solid var(--line2);cursor:pointer;transition:background .12s}
+  .sig:last-child{border-bottom:0}
+  .sig:hover{background:#0e1422}
+  .sig .rt{width:14px;height:14px;flex:none;position:relative}
+  .sig .rt::before,.sig .rt::after{content:"";position:absolute;background:var(--mg)}
+  .sig .rt::before{left:6px;top:0;width:1px;height:14px;opacity:.6}
+  .sig .rt::after{top:6px;left:0;height:1px;width:14px;opacity:.6}
+  .sig .rd{position:absolute;left:5px;top:5px;width:4px;height:4px;border-radius:50%;background:var(--mg);box-shadow:0 0 6px var(--mg);animation:breathe 1.6s infinite}
+  .sig .nm{flex:1;min-width:0;font-size:12px;color:var(--ink)}
+  .sig .nm s{display:block;text-decoration:none;font-size:9px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sig .sg{font-size:9px;color:var(--am);letter-spacing:.06em;text-align:right;max-width:78px;line-height:1.2}
 
   /* ── drawer ── */
-  .scrim{position:fixed;inset:0;background:rgba(4,5,12,.7);opacity:0;pointer-events:none;transition:opacity .15s}
+  .scrim{position:fixed;inset:0;z-index:90;background:rgba(3,5,10,.72);opacity:0;pointer-events:none;transition:opacity .16s}
   .scrim.on{opacity:1;pointer-events:auto}
-  .draw{position:fixed;top:0;right:0;height:100%;width:380px;max-width:92vw;background:var(--panel);
-        border-left:2px solid var(--line);transform:translateX(100%);transition:transform .18s;overflow-y:auto;z-index:5}
-  .draw.on{transform:none} .draw .in{padding:20px}
-  .draw .x{float:right;cursor:pointer;color:var(--ink3);font-size:24px;line-height:1}
-  .draw .code{font-family:'Press Start 2P';font-size:15px;letter-spacing:1px}
-  .draw .role{font-size:19px;color:var(--ink2);margin:8px 0 14px}
-  .draw .st{display:inline-block;font-size:15px;padding:4px 8px;border:1px solid var(--line);margin-bottom:16px;letter-spacing:.5px}
-  .sec{font-family:'Press Start 2P';font-size:9px;color:var(--ink3);letter-spacing:1px;margin:18px 0 8px;text-transform:uppercase}
-  .draw p{font-size:18px;color:var(--ink);line-height:1.35}
-  .wf{list-style:none} .wf li{font-size:17px;color:var(--ink2);line-height:1.3;padding:4px 0 4px 16px;position:relative}
-  .wf li::before{content:"▸";position:absolute;left:0;color:var(--acc)}
-  .kv{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
-  .kv div{border:1px solid var(--line);padding:8px;text-align:center}
-  .kv .v{font-family:'Press Start 2P';font-size:13px;color:var(--ink)} .kv .k{font-size:13px;color:var(--ink3);margin-top:5px}
-  .rec{font-size:16px;color:var(--ink2);line-height:1.4;border-left:2px solid var(--line);padding-left:9px;margin-top:4px}
-  /* ── inside-a-room view ── */
-  #hq{transition:opacity .12s linear}
-  .rv{position:absolute;inset:0;display:none;flex-direction:column;justify-content:space-between;pointer-events:none;z-index:3}
-  .rv.on{display:flex}
-  .rvtop{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px}
-  .rvx{pointer-events:auto;font-family:'VT323';font-size:17px;padding:6px 11px;border:2px solid var(--line);background:rgba(8,10,22,.9);color:var(--ink);cursor:pointer;letter-spacing:.5px}
-  .rvx:hover{border-color:var(--acc);color:var(--acc)}
-  .rvtitle{font-family:'Press Start 2P';font-size:11px;color:#fff;text-shadow:2px 2px 0 #000;letter-spacing:1px}
-  .rvst{font-size:15px;padding:4px 8px;background:rgba(8,10,22,.9);border:1px solid var(--line);letter-spacing:.5px}
-  .rvbot{pointer-events:auto;margin:8px;padding:10px 12px;background:rgba(8,10,22,.92);border:2px solid var(--line)}
-  .rvbot .cur{font-size:18px;color:var(--ink);line-height:1.25;margin-bottom:9px}
-  .rvbot .wf{display:flex;flex-wrap:wrap;gap:6px}
-  .rvbot .wf span{font-size:14px;color:var(--ink2);background:#0e1024;border:1px solid var(--line);padding:3px 7px}
-  .rvbot .kv{display:flex;gap:14px;margin-top:9px;align-items:center}
-  .rvbot .kv b{font-family:'Press Start 2P';font-size:11px;color:var(--acc)} .rvbot .kv i{font-style:normal;font-size:14px;color:var(--ink3)}
-  /* ── FORGE deck overlay: Jarvis "show me a plan for X" ── */
-  .deckov{position:fixed;inset:0;z-index:60;background:rgba(4,6,14,.9);display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto;font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif}
+  .draw{position:fixed;top:0;right:0;height:100%;width:400px;max-width:92vw;z-index:91;background:var(--panel);
+    border-left:1px solid var(--cy);box-shadow:-20px 0 60px -20px rgba(95,228,239,.3);
+    transform:translateX(100%);transition:transform .2s cubic-bezier(.2,.8,.2,1);overflow-y:auto}
+  .draw.on{transform:none}
+  .draw .in{padding:22px}
+  .draw .x{float:right;cursor:pointer;color:var(--dim);font-size:18px;line-height:1;border:1px solid var(--line);padding:3px 8px}
+  .draw .x:hover{color:var(--mg);border-color:var(--mg)}
+  .draw .code{font-family:'Chakra Petch';font-weight:700;font-size:22px;letter-spacing:.1em}
+  .draw .role{font-size:13px;color:var(--mut);margin:4px 0 14px;letter-spacing:.06em}
+  .draw .st{display:inline-block;font-size:10px;padding:4px 9px;border:1px solid var(--line);margin-bottom:16px;letter-spacing:.12em}
+  .sec{font-family:'Chakra Petch';font-weight:600;font-size:10px;color:var(--dim);letter-spacing:.2em;margin:18px 0 9px;text-transform:uppercase;border-bottom:1px solid var(--line2);padding-bottom:5px}
+  .draw p{font-size:13px;color:var(--ink);line-height:1.5}
+  .wf{list-style:none} .wf li{font-size:12px;color:var(--mut);line-height:1.4;padding:5px 0 5px 18px;position:relative}
+  .wf li::before{content:"▸";position:absolute;left:2px;color:var(--cy)}
+  .kv{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
+  .kv div{border:1px solid var(--line2);padding:9px 6px;text-align:center}
+  .kv .v{font-family:'Chakra Petch';font-weight:700;font-size:15px;color:var(--cy)}
+  .kv .k{font-size:9px;color:var(--dim);margin-top:5px;letter-spacing:.06em}
+  .rec{font-size:11px;color:var(--mut);line-height:1.45;border-left:2px solid var(--line);padding-left:10px;margin-top:7px}
+
+  /* ── FORGE deck overlay (client-facing — kept clean/professional) ── */
+  .deckov{position:fixed;inset:0;z-index:120;background:rgba(4,6,14,.92);display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto;font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif}
   .deckwrap{position:relative;width:min(960px,94vw)}
-  .deckx{position:absolute;top:10px;right:10px;z-index:3;background:rgba(8,12,26,.6);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:12px;letter-spacing:.5px;padding:5px 10px;border-radius:8px;cursor:pointer;font-family:'VT323',monospace}
-  .deckx:hover{color:#fff}
-  .deckstage{position:relative;width:100%;aspect-ratio:16/9;border-radius:14px;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.65)}
+  .deckx{position:absolute;top:10px;right:10px;z-index:3;background:rgba(8,12,26,.6);border:1px solid var(--cy);color:var(--cy);font-size:11px;letter-spacing:.1em;padding:6px 11px;cursor:pointer;font-family:'JetBrains Mono',monospace}
+  .deckx:hover{background:var(--cy);color:#04121a}
+  .deckstage{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 90px rgba(0,0,0,.65)}
   .dslide{position:absolute;inset:0;padding:7% 8%;display:none;flex-direction:column;justify-content:center;box-sizing:border-box;overflow-y:auto}
   .dslide.on{display:flex}
   .dslide.navy{background:#0c1430;color:#fff}
@@ -138,12 +202,12 @@
   .dlabel{font-size:11px;font-weight:800;color:#6b7398;letter-spacing:1px;min-width:90px;text-transform:uppercase}
   .dval{font-size:clamp(13px,1.9vw,18px);color:#1b2444}
   .dnums{display:flex;gap:16px;margin-top:6px}
-  .dnumcard{flex:1;border-radius:12px;padding:22px 12px;color:#fff;text-align:center}
+  .dnumcard{flex:1;padding:22px 12px;color:#fff;text-align:center}
   .dnl{font-size:11px;font-weight:800;letter-spacing:.5px;opacity:.92}
   .dnv{font-size:clamp(16px,2.6vw,26px);font-weight:800;margin-top:10px}
   .dfoot{font-size:12px;color:#6b7398;margin-top:20px}
   .dangles{display:flex;gap:16px;margin-top:6px}
-  .dac{flex:1;background:#fff;border:1px solid #dde6f5;border-radius:12px;padding:18px}
+  .dac{flex:1;background:#fff;border:1px solid #dde6f5;padding:18px}
   .dacn{width:34px;height:34px;border-radius:50%;background:#46d6e6;color:#0c1430;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:17px}
   .dact{font-size:clamp(13px,1.7vw,16px);font-weight:800;color:#0c1430;margin:12px 0 8px}
   .dacd{font-size:clamp(11px,1.4vw,13px);color:#6b7398;line-height:1.45}
@@ -151,404 +215,573 @@
   .dofsub{font-size:clamp(12px,1.6vw,15px);color:#46d6e6;font-weight:800;letter-spacing:1px;margin-top:10px}
   .dofbody{font-size:clamp(14px,1.9vw,18px);color:#cfd6f0;margin-top:16px;line-height:1.5}
   .dofnote{font-size:13px;color:#aeb8e0;margin-top:14px}
-  .dofcta{display:inline-block;margin-top:22px;background:#46d6e6;color:#0c1430;font-weight:800;padding:11px 20px;border-radius:10px;font-size:14px}
+  .dofcta{display:inline-block;margin-top:22px;background:#46d6e6;color:#0c1430;font-weight:800;padding:11px 20px;font-size:14px}
   .decknav{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:18px}
-  .dbtn{background:#13162b;border:1px solid #2c3158;color:#eaf0ff;width:42px;height:42px;border-radius:50%;font-size:22px;cursor:pointer;line-height:1}
-  .dbtn:hover{border-color:#46d6e6;color:#46d6e6}
+  .dbtn{background:var(--panel);border:1px solid var(--line);color:var(--ink);width:42px;height:42px;font-size:22px;cursor:pointer;line-height:1}
+  .dbtn:hover{border-color:var(--cy);color:var(--cy)}
   .ddots{display:flex;gap:8px}
-  .ddot{width:8px;height:8px;border-radius:50%;background:#2c3158;cursor:pointer}
-  .ddot.on{background:#46d6e6}
-  @media (max-width:680px){ .dnums,.dangles{flex-direction:column} .dslide{padding:6% 7%} .dnumcard,.dac{padding:14px} .dlabel{min-width:74px} }
+  .ddot{width:8px;height:8px;border-radius:50%;background:var(--line);cursor:pointer}
+  .ddot.on{background:var(--cy)}
+
+  .glitch{animation:glitch .14s steps(2) 1}
+  @keyframes glitch{0%{text-shadow:-1.5px 0 var(--mg),1.5px 0 var(--cy);transform:translateX(0)}
+    50%{text-shadow:1.5px 0 var(--mg),-1.5px 0 var(--cy);transform:translateX(1px)}
+    100%{text-shadow:none;transform:none}}
+
+  @media (max-width:1100px){
+    body{overflow:auto}
+    .deck{height:auto;min-height:100vh;grid-template-rows:auto auto auto auto}
+    .stage{min-height:840px}
+    .bus{position:relative;flex-direction:column;align-items:stretch;padding:20px 0}
+    .col{align-items:stretch} .col.lift,.col.drop{margin:0 0 18px}
+    .chip,.daughter{max-width:none}
+    .bottom{grid-template-columns:1fr}
+    .ribbon{min-height:40px}
+  }
+  @media (max-width:680px){
+    .dnums,.dangles{flex-direction:column} .dlabel{min-width:74px}
+    .vitals{flex-wrap:wrap;gap:4px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .scan,.scanbar,.led,.sig .rd{animation:none!important}
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="scan"></div><div class="vig"></div>
+<i class="brk tl"></i><i class="brk tr"></i><i class="brk bl"></i><i class="brk br"></i>
 
-  <header class="bar pf" style="box-shadow:none;border-width:0 0 2px 0">
-    <div class="logo">CBC<b>MEDIA</b> <span>// HQ</span></div>
-    <div class="pills">
-      <span class="pill"><b>●</b> LIVE · YOUR CRM</span>
-      <span class="pill"><span class="dz">●</span> FLEET <b>STANDBY</b></span>
-      <span class="pill" id="clock">--:--:--</span>
+<div class="deck">
+
+  <!-- ── TOP RAIL ── -->
+  <header class="top">
+    <div class="wm">DECK<b>//</b>SLO<span class="sub">RIG-0x1F · SLO-CO · CBC MEDIA</span></div>
+    <div class="ctr">
+      <div id="clock">--:--:--</div>
+      <div class="shift">SHIFT 07:00 → 09:00 · PT</div>
+    </div>
+    <div class="vitals">
+      <span class="vital"><b id="v-leads">170+</b> LEADS</span>
+      <span class="vital zero"><b>0</b> BOOKED</span>
+      <span class="vital zero"><b>0</b> CLIENTS</span>
+      <span class="vital zero"><b>$0</b> MRR</span>
     </div>
   </header>
 
-  <div class="stats">
-    <div class="stat pf c0"><div class="n" id="s-leads">104</div><div class="l">Leads</div></div>
-    <div class="stat pf c1"><div class="n">8</div><div class="l">Warm</div></div>
-    <div class="stat pf c2"><div class="n">28</div><div class="l">Follow-ups</div></div>
-    <div class="stat pf c3"><div class="n">0</div><div class="l">Meetings</div></div>
-    <div class="stat pf c4"><div class="n">0</div><div class="l">Clients</div></div>
+  <!-- ── MAIN STAGE: CIRCUIT TRACE BUS ── -->
+  <section class="stage">
+    <canvas id="trace"></canvas>
+    <div class="scanbar"></div>
+    <div class="bus" id="bus"></div>
+    <div class="legend"><b>●</b> lead packet flows L→R &nbsp;·&nbsp; <i>solid</i> trace = auto pipeline &nbsp;·&nbsp; dotted = manual / on-demand</div>
+  </section>
+
+  <!-- ── SHIFT RIBBON ── -->
+  <div class="ribbon">
+    <span class="ribtag">SHIFT</span>
+    <canvas id="rib"></canvas>
   </div>
 
-  <div class="main">
-    <div>
-      <div class="stage pf" style="background:#06070f">
-        <canvas id="hq" width="320" height="200"></canvas>
-        <div class="grid" id="grid"></div>
-        <div class="scan"></div>
-        <div class="vig"></div>
-        <div class="rv" id="rv">
-          <div class="rvtop">
-            <button class="rvx" onclick="exitRoom()">← EXIT</button>
-            <span class="rvtitle" id="rvtitle"></span>
-            <span class="rvst" id="rvst"></span>
-          </div>
-          <div class="rvbot" id="rvbot"></div>
+  <!-- ── BOTTOM RAIL ── -->
+  <div class="bottom">
+    <div class="term">
+      <div class="log"><span class="dot"></span><span id="logline"></span></div>
+      <div class="core">
+        <div class="corehead">
+          <canvas id="jcore" width="40" height="40"></canvas>
+          <div class="cap" id="cap">JARVIS kernel online. Click a node to inspect a daemon — or speak.</div>
         </div>
-      </div>
-
-      <div class="console pf">
-        <div class="cap" id="cap">JARVIS online. Click a room to inspect an agent — or ask me anything.</div>
         <div class="cmd">
-          <span class="pr">&gt;</span>
+          <span class="prompt">core@cbc:~$</span>
           <input id="ask" placeholder="talk to jarvis… (or press space)" autocomplete="off">
-          <button class="btn" id="mic">MIC</button>
-          <button class="btn on" id="spk">VOICE</button>
+          <button class="tbtn" id="mic">MIC</button>
+          <button class="tbtn on" id="spk">VOICE</button>
         </div>
-        <div class="hint">space / clap = listen · click JARVIS core for the briefing</div>
+        <div class="hint">space / clap = listen · click a node for its dossier · "show me a plan for [business]"</div>
       </div>
     </div>
 
-    <div class="side">
-      <div class="card pf">
-        <div class="h">Warm Leads</div>
-        <div id="warm"></div>
-      </div>
-      <div class="card pf">
-        <div class="h">Territory</div>
-        <div style="font-size:18px;color:var(--ink2);line-height:1.4">
-          <span style="color:var(--acc)">▣</span> San Luis Obispo County<br>
-          <span style="font-size:15px;color:var(--ink3)">territory 01 / 13 · SLO → CA → US</span>
-        </div>
-      </div>
+    <div class="signals">
+      <div class="sighead">ACTIVE SIGNALS <s id="warmcount"></s></div>
+      <div class="siglist" id="warm"></div>
     </div>
   </div>
 </div>
 
 <div class="scrim" id="scrim"></div>
-<div class="draw pf" id="draw" style="box-shadow:none"><div class="in" id="drawin"></div></div>
+<div class="draw" id="draw"><div class="in" id="drawin"></div></div>
 
 <script>
 const $=s=>document.querySelector(s);
 
-/* ───────────────── DATA (real CRM state, honest) ───────────────── */
-// state: standby (asleep) · warm (amber idle) · ready (awake, did work)
-const AG = {
-  pr:{code:'SCOUT', role:'Prospector', state:'ready', hue:[95,224,239], cell:0,
-     desc:'Finds local businesses by niche + geo that aren’t running Meta ads, dedupes against the CRM, and writes new leads in.',
-     st:'LIVE · 104 in CRM',
-     wf:['Pull the next territory (SLO County first)','Find local service businesses','Drop anyone already in the CRM','Keep 10–250 reviews, has a phone','Capture name / phone / niche → ORACLE'],
-     stats:[['30','last run'],['104','in CRM'],['daily','7am PT']],
-     rec:['LIVE on Google Places — runs every morning ~7am','Last run added 30 (HVAC + electrical)','104 leads in CRM · deduped + giant-filtered']},
-  en:{code:'ORACLE', role:'Enricher', state:'ready', hue:[86,143,255], cell:1,
-     desc:'Finds a deliverable email for each lead by scraping its website, and writes it to the CRM.',
-     st:'LIVE · 45 emails on file', wf:['Look up the lead’s website via Places','Fetch the site + contact page','Extract the best real email','Write it to the CRM','Hand enriched leads → FORGE'],
-     stats:[['45','emails'],['~50%','hit rate'],['live','status']],
-     rec:['LIVE — scrapes a real email from each lead’s site','45 leads now have an email on file','Run “Enrich emails” from the SCOUT menu']},
-  pb:{code:'FORGE', role:'Plan Builder', state:'standby', hue:[244,176,64], cell:2,
-     desc:'Builds a custom Meta ads growth plan per business — budget tier, audience, three creative angles, honest CPL.',
-     st:'STANDBY', wf:['Research the business + competitors','Pick a budget tier + audience','Write 3 creative angles for the niche','Project a realistic cost-per-lead','Build the plan doc → SCRIBE'],
-     stats:[['0','drafted'],['3','angles ea.'],['idle','status']],
-     rec:['Built — not launched yet','One plan doc per business','Honest benchmarks only']},
-  cw:{code:'SCRIBE', role:'Copywriter', state:'standby', hue:[168,130,255], cell:5,
-     desc:'Writes the short, human cold email that teases the plan — one specific observation, a link, no spam triggers.',
-     st:'STANDBY', wf:['3–4 sentence plain-text email','Open with one specific observation','Tease the plan + link the doc','Keep it human, no templates','Queue for your approval'],
-     stats:[['0','queued'],['1','plan link'],['idle','status']],
-     rec:['Built — not launched yet','Nothing sends without your approval','Varies language per lead']},
-  sd:{code:'RELAY', role:'Sender', state:'warm', hue:[61,214,140], cell:8,
-     desc:'Sends approved emails from charlie@cbcmediamarketing.com and manages the inbox warmup ramp.',
-     st:'PRE-WARMUP · DAY 0', wf:['Hold until you approve the day’s emails','Ramp ~10/day → ~40/day over 2–3 wks','Send plain-text from charlie@','Watch bounce + spam, pause if spikes','Log every send'],
-     stats:[['0','sent'],['Day 0','warmup'],['✓','SPF/DKIM']],
-     rec:['Inbox configured — SPF/DKIM/DMARC passing','Warmup not started','Ready to ramp on your go']},
-  rt:{code:'SENTRY', role:'Reply Triage', state:'standby', hue:[251,113,133], cell:7,
-     desc:'Reads the inbox and flags every reply warm / not / unsubscribe — never auto-replies, drafts for your approval.',
-     st:'STANDBY', wf:['Read new replies to charlie@','Classify warm / not / unsubscribe','Push warm ones to the Warm list','Draft a reply for your approval','Honor unsubscribes instantly'],
-     stats:[['0','warm'],['100%','to you'],['idle','status']],
-     rec:['Built — not launched yet','Will draft replies for approval','Watches once email goes out']},
-  bk:{code:'CLOSER', role:'Booking', state:'standby', hue:[240,200,90], cell:6,
-     desc:'On an approved warm reply, offers a 15-min Google Meet, sends the link, and confirms the meeting is real.',
-     st:'STANDBY', wf:['Offer a 15-min Google Meet','Collect email + send the link','A sent link ≠ a booked meeting','If unconfirmed, make a follow-up','Log the meeting'],
-     stats:[['0','booked'],['3','warm waiting'],['idle','status']],
-     rec:['Built — not launched yet','3 warm leads need a Meet link now','Fires on your first approved reply']},
-  fu:{code:'ECHO', role:'Follow-up', state:'standby', hue:[236,130,200], cell:3,
-     desc:'Runs the multi-touch follow-up cadence on non-replies — new angle, then a short nudge, stops the moment they reply.',
-     st:'STANDBY', wf:['Watch emails that got no reply','Wait 2 days → follow-up #2','Wait 3 more → short #3','Stop the moment they reply','Default follow-up = Friday'],
-     stats:[['0','sent'],['28','due now'],['idle','status']],
-     rec:['Built — not launched yet','28 manual follow-ups due this week','Cadence armed']}
+/* ═══════════════ DATA — real pipeline state (honest) ═══════════════ */
+const AG={
+  scout:{code:'SCOUT',role:'Prospector',state:'live',pid:'0x01',die:'radar',
+    last:'wrote ~30 leads · 07:00',next:'07:00 daily',thru:'~30 / run',hand:'→ ORACLE',
+    desc:'Finds local SLO-County businesses by niche + geo via Google Places, dedupes against the CRM, and writes new leads in — every morning at 7am.',
+    wf:['Pull the next territory (SLO County)','Query Google Places by niche','Drop anyone already in the CRM','Keep 10–250 reviews, has a phone','Write name / phone / niche → ORACLE'],
+    stats:[['~30','per run'],['170+','in CRM'],['07:00','daily']],
+    rec:['LIVE — fires every morning ~7am','Last run added ~30 (HVAC + electrical)','170+ leads in CRM, deduped + filtered']},
+  oracle:{code:'ORACLE',role:'Enricher',state:'live',pid:'0x02',die:'decrypt',
+    last:'14 emails found · 07:30',next:'07:30 daily',thru:'~50% hit',hand:'→ RELAY',
+    desc:'Finds a deliverable email for each new lead by scraping its website + contact page, and writes it to the CRM.',
+    wf:['Look up the lead’s website via Places','Fetch the site + contact page','Extract the best real email','Write it to the CRM','Hand enriched leads → RELAY'],
+    stats:[['~50%','hit rate'],['07:30','daily'],['LIVE','status']],
+    rec:['LIVE — scrapes a real email per lead','~half of leads get an email on file','Runs right after SCOUT']},
+  relay:{code:'RELAY',role:'Sender',state:'live',pid:'0x04',die:'packet',
+    last:'15 sent · 08:00',next:'08:00 daily',thru:'15 / day cap',hand:'→ ECHO',
+    desc:'Sends the personalized cold email (written by SCRIBE) from charlie@cbcmediamarketing.com via Brevo — capped at 15/day while warming the domain.',
+    wf:['Take enriched leads from ORACLE','SCRIBE writes the personalized email','Send via Brevo, max 15/day','Domain SPF / DKIM / DMARC authenticated','Mark Outreach Sent → ECHO'],
+    stats:[['15','per day'],['08:00','daily'],['✓','SPF/DKIM']],
+    rec:['LIVE — sending cold emails daily','From charlie@cbcmediamarketing.com','Domain fully authenticated']},
+  scribe:{code:'SCRIBE',role:'Copywriter',state:'live',pid:'0x03',die:'type',
+    last:'drafting copy',next:'per send',thru:'Sonnet 4.6',hand:'⊂ RELAY',
+    desc:'Writes the short, human cold email per lead — one specific observation about that business, no spam triggers. Runs inside RELAY via Claude Sonnet.',
+    wf:['Read the lead’s niche + city + site','Open with one specific observation','3–4 sentence plain-text email','No templates, varies per lead','Hand the draft → RELAY to send'],
+    stats:[['Sonnet','model'],['1','per lead'],['LIVE','status']],
+    rec:['LIVE — runs inside every RELAY send','Personalized per business','Claude Sonnet 4.6']},
+  echo:{code:'ECHO',role:'Follow-up',state:'live',pid:'0x05',die:'ping',
+    last:'8 bumps sent · 09:00',next:'09:00 daily',thru:'10 / day cap',hand:'→ SENTRY',
+    desc:'Sends a single follow-up bump to any lead that got no reply after 3 days — then stops the moment they reply.',
+    wf:['Watch leads at Outreach Sent','Wait 3 days with no reply','Send one short follow-up bump','Cap 10/day','Stop the instant they reply']
+    ,stats:[['10','per day'],['+3d','delay'],['09:00','daily']],
+    rec:['LIVE — fires daily at 9am','One bump after 3 silent days','Built + armed this session']},
+  sentry:{code:'SENTRY',role:'Reply Monitor',state:'live',pid:'0x06',die:'scope',
+    last:'inbox scan · now',next:'every 2h',thru:'reply triage',hand:'→ CLOSER',
+    desc:'Reads the inbox every 2 hours, classifies each reply interested / question / not / OOO via Claude Haiku, updates the CRM, and pings Discord on a warm signal.',
+    wf:['Read new replies to charlie@','Classify via Claude Haiku','Warm → push to CLOSER','Question → flag for your reply','Ping Discord on warm signals'],
+    stats:[['2h','cadence'],['Haiku','model'],['LIVE','status']],
+    rec:['LIVE — checks inbox every 2 hours','Classifies + routes every reply','Discord ping on warm signal']},
+  closer:{code:'CLOSER',role:'Booking',state:'live',pid:'0x07',die:'lock',
+    last:'link sent · Wallace',next:'on warm reply',thru:'event',hand:'→ FORGE',
+    desc:'On a warm reply, sends a 15-min Google Meet booking link automatically — and reminds you a sent link is not a booked meeting until confirmed.',
+    wf:['Fires when SENTRY flags warm','Send the 15-min Google Meet link','A sent link ≠ a booked meeting','Confirm or follow up','Log the meeting'],
+    stats:[['2','links out'],['0','booked'],['event','trigger']],
+    rec:['LIVE — fires on warm replies','Flickinger + Wallace links sent','Awaiting first confirmed booking']},
+  forge:{code:'FORGE',role:'Plan Builder',state:'standby',pid:'0x08',die:'deck',
+    last:'idle',next:'on demand',thru:'manual',hand:'deck → you',
+    desc:'On demand, builds a 6-slide branded Meta-ads growth plan per business — budget tier, audience, three creative angles, honest CPL. Trigger it from the console: "show me a plan for [business]".',
+    wf:['Triggered manually per booked meeting','Research the business + niche','Pick budget tier + audience','Write 3 creative angles','Build the 6-slide deck']
+    ,stats:[['6','slides'],['Sonnet','model'],['MANUAL','status']],
+    rec:['On-demand — not in the auto-flow','Ask JARVIS: “show me a plan for X”','Honest local benchmarks only']}
 };
-const ORDER=['pr','en','pb','cw','sd','rt','bk','fu'];
-const STDOT={ready:'#5fe4ef',warm:'#f0c85a',standby:'#5b618f'};
+// main bus order (left→right); SCRIBE nests in RELAY, FORGE branches under CLOSER
+const ROW=['scout','oracle','relay','echo','sentry','closer'];
 
 const LEADS=[
-  {i:'FP',g:'#fb7185',n:'Flickinger Painting',sub:'Painting · Atascadero',sg:'wants to book',
-   body:'Luisa wants to book a meeting — the hottest lead in the pipeline. Send the booking link and confirm the Meet (a sent link ≠ booked).'},
-  {i:'WP',g:'#5fe4ef',n:'Wallace Plumbing',sub:'Plumbing · SLO',sg:'said yes',
-   body:'Jordan said yes to setting up a time. Collecting his email to send the Google Meet link.'},
-  {i:'EF',g:'#f0c85a',n:'Exact Fit Coupling',sub:'Plumbing supply · SLO',sg:'wants mktg',
+  {i:'FP',g:'#fb7185',n:'Flickinger Painting',sub:'Painting · Atascadero',sg:'link sent',
+   body:'Luisa — the hottest lead. Booking link sent; confirm the Meet (a sent link ≠ booked).'},
+  {i:'WP',g:'#5fe4ef',n:'Wallace Plumbing',sub:'Plumbing · SLO',sg:'link sent',
+   body:'Jordan said yes via text. Booking link sent to his phone — waiting on him to grab a time.'},
+  {i:'EF',g:'#f5b942',n:'Exact Fit Coupling',sub:'Plumbing supply · SLO',sg:'wants mktg',
    body:'Bobby Ryan wants marketing for Exact Fit. Info email sent; waiting on a Meet booking.'},
-  {i:'KC',g:'#3dd68c',n:'Kyle Company Roofing',sub:'Roofing · SLO',sg:'interested',
-   body:'Overcame the "never needed social media" objection. Got his email, sent info. Follow up Friday.'},
-  {i:'DL',g:'#a882ff',n:"Dan's Landscaping",sub:'Landscaping · SLO',sg:'warm',
+  {i:'KC',g:'#43e0a0',n:'Kyle Company Roofing',sub:'Roofing · SLO',sg:'interested',
+   body:'Overcame the “never needed social media” objection. Got his email, sent info. Follow up Friday.'},
+  {i:'DL',g:'#ff3d81',n:"Dan's Landscaping",sub:'Landscaping · SLO',sg:'warm',
    body:'Gabby (office manager) says Dan has been interested in marketing. Warm — Dan to call back.'},
-  {i:'BO',g:'#568fff',n:"Brad's Overhead Doors",sub:'Garage Doors · Paso',sg:'July',
+  {i:'BO',g:'#568fff',n:"Brad's Overhead Doors",sub:'Garage Doors · Paso',sg:'~July',
    body:'Interested but wants to start mid-July. Got his email. Call back ~Jul 16.'}
 ];
 
-/* ───────────────── PIXEL HQ RENDERER ───────────────── */
+/* ═══════════════ SHARED TICKER (one rAF for everything) ═══════════════ */
+const REDUCED=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+const dies=[]; let F=0, paused=false;
+document.addEventListener('visibilitychange',()=>{paused=document.hidden;});
+function tick(){
+  if(!paused){
+    F++;
+    for(const d of dies){ if(d.live()) d.draw(); }
+    drawTrace(); drawJCore();
+    if(F%2===0) drawRibbon();
+  }
+  requestAnimationFrame(tick);
+}
+
+/* small canvas helper: sets up a hi-dpi context sized to its element */
+function mkCanvas(parent,h){
+  const cv=document.createElement('canvas'); parent.appendChild(cv);
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  function size(){const r=parent.getBoundingClientRect();
+    cv.width=Math.max(1,r.width*dpr); cv.height=Math.max(1,(h||r.height)*dpr);}
+  size(); window.addEventListener('resize',size);
+  const g=cv.getContext('2d');
+  return {cv,g,dpr,w:()=>cv.width/dpr,h:()=>cv.height/dpr,size};
+}
+const COL={cy:'#5fe4ef',mg:'#ff3d81',am:'#f5b942',gn:'#43e0a0',dim:'#3a4a5e',ink:'#cfe6ea'};
+
+/* ═══════════════ PER-AGENT ACTIVITY DIES ═══════════════ */
+const DIE={
+  // SCOUT — rotating radar painting found-lead blips
+  radar(g,w,h,f){
+    const cx=w*.5,cy=h*.5,R=Math.min(w,h)*.42;
+    g.strokeStyle='rgba(95,228,239,.18)';g.lineWidth=1;
+    for(let i=1;i<=2;i++){g.beginPath();g.arc(cx,cy,R*i/2,0,7);g.stroke();}
+    g.beginPath();g.moveTo(cx-R,cy);g.lineTo(cx+R,cy);g.moveTo(cx,cy-R);g.lineTo(cx,cy+R);g.stroke();
+    const ang=(f*.05)%(Math.PI*2);
+    const grd=g.createLinearGradient(cx,cy,cx+Math.cos(ang)*R,cy+Math.sin(ang)*R);
+    grd.addColorStop(0,'rgba(95,228,239,.55)');grd.addColorStop(1,'rgba(95,228,239,0)');
+    g.strokeStyle=grd;g.lineWidth=2;g.beginPath();g.moveTo(cx,cy);g.lineTo(cx+Math.cos(ang)*R,cy+Math.sin(ang)*R);g.stroke();
+    const blips=[[.6,2.1],[.85,4.0],[.45,5.3],[.7,0.6],[.9,3.1]];
+    blips.forEach((b,i)=>{const ba=b[1],br=b[0]*R;const dx=cx+Math.cos(ba)*br,dy=cy+Math.sin(ba)*br;
+      let near=Math.cos(ang-ba);near=near>.985?1:0;
+      const lit=((f/14|0)%blips.length)>=i;
+      g.fillStyle= near? COL.mg : (lit?COL.cy:'rgba(95,228,239,.25)');
+      g.fillRect(dx-1.3,dy-1.3,2.6,2.6);});
+  },
+  // ORACLE — website wireframe; email resolves char-by-char, ~50% hit/miss
+  decrypt(g,w,h,f){
+    g.strokeStyle='rgba(95,228,239,.25)';g.lineWidth=1;g.strokeRect(6,6,w*.42,h-12);
+    g.fillStyle='rgba(95,228,239,.18)';
+    for(let i=0;i<4;i++)g.fillRect(10,12+i*7,w*.42-8,2);
+    const sy=12+((f*.6)%(h-20));g.fillStyle='rgba(95,228,239,.5)';g.fillRect(6,sy,w*.42,1);
+    const cycle=(f/3|0)%14, hit=((f/42|0)%2)===0;
+    const target='owner@biz.com', shown=Math.min(target.length,cycle);
+    let str='';const ch='@#%&0xff><_/';
+    for(let i=0;i<target.length;i++)str+= i<shown? target[i] : ch[(f+i)%ch.length];
+    g.font='8px JetBrains Mono';g.textBaseline='middle';
+    const done=cycle>=target.length;
+    g.fillStyle= done? (hit?COL.cy:COL.am) : COL.ink;
+    g.fillText(done&&!hit?'NO MATCH':str, w*.5, h*.5);
+    g.fillStyle=done?(hit?COL.cy:COL.am):'rgba(95,228,239,.4)';
+    g.fillText(done?(hit?'▸ HIT':''):'', w*.5, h*.5+11);
+  },
+  // SCRIBE — typewriter laying down copy with a magenta CTA token
+  type(g,w,h,f){
+    g.font='8px JetBrains Mono';g.textBaseline='middle';
+    const lines=['hey luisa —','saw flickinger isn’t','running meta ads.','{book a 15-min}'];
+    const tot=(f*.7)%70, caret=tot%1>.5;
+    let acc=0;
+    for(let i=0;i<lines.length;i++){
+      const L=lines[i];const start=acc;acc+=L.length+3;
+      const vis=Math.max(0,Math.min(L.length,(tot)-start));
+      const cta=L.indexOf('{')===0;
+      g.fillStyle= cta?COL.mg:'rgba(207,230,234,.85)';
+      g.fillText(L.slice(0,vis), 6, 9+i*13);
+      if(vis>0&&vis<L.length&&caret){g.fillStyle=COL.mg;g.fillText('_',6+vis*4.9,9+i*13);}
+    }
+  },
+  // RELAY — email packets fire through SPF/DKIM/DMARC gate toward 15-cap
+  packet(g,w,h,f){
+    const gx=w*.6;
+    g.strokeStyle='rgba(95,228,239,.35)';g.setLineDash([2,3]);g.beginPath();g.moveTo(gx,8);g.lineTo(gx,h-8);g.stroke();g.setLineDash([]);
+    g.font='6px JetBrains Mono';g.fillStyle='rgba(95,228,239,.5)';
+    ['SPF','DKIM','DMARC'].forEach((t,i)=>{const yy=12+i*((h-22)/2);
+      const on=((f/8|0)%3)>=i; g.fillStyle=on?COL.gn:'rgba(67,224,160,.25)';g.fillText('✓',gx-3,yy-3);
+      g.fillStyle='rgba(95,228,239,.45)';g.fillText(t,gx+5,yy);});
+    for(let i=0;i<3;i++){
+      const ph=((f*.04)+i*.34)%1; const x=8+ph*(w-16); const y=h*.5+Math.sin(i*2)*4;
+      g.fillStyle= x<gx? COL.cy : COL.mg;
+      g.fillRect(x-3,y-2.5,6,5);g.fillStyle='#06080f';g.fillRect(x-3,y-2.5,6,1.5);
+    }
+    g.font='8px JetBrains Mono';g.fillStyle=COL.cy;g.textBaseline='alphabetic';
+    g.fillText(((f/20|0)%16)+'/15',8,h-5);g.textBaseline='middle';
+  },
+  // ECHO — outbound ping returns a fainter echo after a delay (3-day bump)
+  ping(g,w,h,f){
+    const cx=w*.5,cy=h*.5; const ph=(f*.03)%1;
+    g.strokeStyle=`rgba(95,228,239,${.6*(1-ph)})`;g.lineWidth=1.5;
+    g.beginPath();g.arc(cx,cy,4+ph*16,0,7);g.stroke();
+    const ph2=((f*.03)-.4+1)%1;
+    if(ph2<1){g.strokeStyle=`rgba(255,61,129,${.35*(1-ph2)})`;g.lineWidth=1;
+      g.beginPath();g.arc(cx,cy,4+ph2*13,0,7);g.stroke();}
+    g.fillStyle=COL.cy;g.fillRect(cx-1.5,cy-1.5,3,3);
+    g.font='7px JetBrains Mono';g.fillStyle=COL.mg;g.textBaseline='middle';g.fillText('+3d',cx+18,cy);
+    g.fillStyle='rgba(95,228,239,.4)';g.textBaseline='alphabetic';
+    for(let i=0;i<10;i++){g.fillStyle=i<((f/12|0)%11)?COL.cy:'rgba(95,228,239,.2)';g.fillRect(6+i*((w-12)/10),h-6,((w-12)/10)-2,2);}
+    g.textBaseline='middle';
+  },
+  // SENTRY — oscilloscope snapping replies into 4 classifier bins
+  scope(g,w,h,f){
+    g.strokeStyle='rgba(95,228,239,.12)';g.lineWidth=1;
+    const bins=[['INT',COL.cy],['Q',COL.cy],['NO',COL.mg],['OOO',COL.am]];
+    for(let i=0;i<4;i++){const yy=8+i*((h-12)/3);g.beginPath();g.moveTo(20,yy);g.lineTo(w-4,yy);g.stroke();
+      g.font='6px JetBrains Mono';g.fillStyle='rgba(174,185,196,.5)';g.textBaseline='middle';g.fillText(bins[i][0],2,yy);}
+    const sel=(f/26|0)%4; const yTar=8+sel*((h-12)/3);
+    g.strokeStyle=bins[sel][1];g.lineWidth=1.5;g.beginPath();
+    for(let x=20;x<w-4;x+=2){const prog=(x-20)/(w-24);
+      let y=h*.5; if(prog>.4&&prog<.6){y=h*.5-Math.sin((prog-.4)*15.7)*14;} else {y=yTar;}
+      x===20?g.moveTo(x,y):g.lineTo(x,y);}
+    g.stroke();
+    g.fillStyle=bins[sel][1];g.fillRect(w-7,yTar-2,4,4);
+  },
+  // CLOSER — target-lock reticle; idle orbit, occasional lock
+  lock(g,w,h,f){
+    const cx=w*.5,cy=h*.5; const lock=((f/40|0)%3)===0;
+    g.strokeStyle=lock?COL.mg:'rgba(95,228,239,.4)';g.lineWidth=1;
+    const R=lock?9:14+Math.sin(f*.08)*2;
+    g.beginPath();g.arc(cx,cy,R,0,7);g.stroke();
+    g.beginPath();g.moveTo(cx-R-3,cy);g.lineTo(cx-R+4,cy);g.moveTo(cx+R-4,cy);g.lineTo(cx+R+3,cy);
+    g.moveTo(cx,cy-R-3);g.lineTo(cx,cy-R+4);g.moveTo(cx,cy+R-4);g.lineTo(cx,cy+R+3);g.stroke();
+    const oa=f*.06; const ox=cx+Math.cos(oa)*(lock?0:9), oy=cy+Math.sin(oa)*(lock?0:9);
+    g.fillStyle=lock?COL.mg:COL.cy;g.fillRect(ox-1.5,oy-1.5,3,3);
+    g.font='6px JetBrains Mono';g.textBaseline='middle';
+    g.fillStyle=lock?COL.mg:'rgba(174,185,196,.55)';
+    g.fillText(lock?'▸ LOCK · MEET SENT':'AWAIT WARM SIGNAL', 4, h-6);
+  },
+  // FORGE — assembles 6 slide blocks then DECK READY (amber/idle until building)
+  deck(g,w,h,f){
+    const building=AG.forge._build; const base=building?COL.cy:'rgba(245,185,66,.5)';
+    const n= building? 6 : ((f/22|0)%8);
+    for(let i=0;i<6;i++){const col=i%3,row=i/3|0;
+      const bw=(w-16)/3-3,bh=(h-16)/2-3;const x=6+col*((w-12)/3),y=6+row*((h-12)/2);
+      g.strokeStyle=base;g.lineWidth=1;g.globalAlpha=i<n?1:.18;g.strokeRect(x,y,bw,bh);
+      if(i<n){g.fillStyle=building?'rgba(95,228,239,.12)':'rgba(245,185,66,.10)';g.fillRect(x,y,bw,bh);}
+      g.globalAlpha=1;}
+    if(n>=6){g.font='7px JetBrains Mono';g.fillStyle=building?COL.cy:COL.am;g.textBaseline='middle';
+      g.fillText(building?'BUILDING…':'DECK READY', w*.5-22, h-4);}
+  }
+};
+AG.forge._build=false;
+
+/* ═══════════════ BUILD CHIP NODES ═══════════════ */
 (function(){
-  const VC=document.getElementById('hq'), vx=VC.getContext('2d');
-  const off=document.createElement('canvas'); off.width=320; off.height=200;
-  const c=off.getContext('2d');
-  const W=320,H=200, CW=W/3, CH=H/3;
-  function fit(){const r=VC.getBoundingClientRect();const dpr=Math.min(window.devicePixelRatio||1,1.5);
-    VC.width=Math.max(1,Math.round(r.width*dpr));VC.height=Math.max(1,Math.round(r.height*dpr));
-    vx.imageSmoothingEnabled=false;}
-  function px(x,y,w,h,col){c.fillStyle=col;c.fillRect(x|0,y|0,w|0,h|0);}
-  const rgb=(a,m=1)=>`rgb(${a[0]*m|0},${a[1]*m|0},${a[2]*m|0})`;
-
-  function room(col,row,a,f){
-    const x=col*CW, y=row*CH, w=CW, h=CH, hue=a.hue, on=a.state!=='standby';
-    // walls + back
-    px(x,y,w,h,'#0c0e1c');
-    px(x+2,y+2,w-4,h-4, rgb(hue, on?0.46:0.22));            // back wall
-    px(x+2,y+h-15,w-4,13, rgb(hue, on?0.7:0.32));            // floor
-    px(x+2,y+2,w-4,2, rgb(hue,1.0));                          // top trim light
-    // window/poster on back wall
-    px(x+8,y+8,12,9, rgb(hue, on?1.0:0.45)); px(x+9,y+9,10,2,'#0c0e1c');
-    // desk
-    const dx=x+w/2-15, dy=y+h-22;
-    px(dx,dy,30,3,'#3a2f25'); px(dx+1,dy+3,3,7,'#2a2118'); px(dx+26,dy+3,3,7,'#2a2118');
-    // monitor on desk
-    px(dx+19,dy-12,11,11,'#1a1d33'); px(dx+20,dy-11,9,7, on?rgb(hue,1):'#23263f');
-    if(on && f%2) px(dx+21,dy-10,7,1, rgb(hue,1.4)); // scanline blink
-    px(dx+23,dy-1,3,3,'#1a1d33');
-    // agent character at desk
-    const bob = (on && f%2)? -1 : 0;
-    char(dx+6, dy-13+bob, hue, a.state, f);
-    // status light
-    px(x+w-7,y+5,3,3, STDOT[a.state]);
-    if(a.state==='standby'){ // zzz
-      px(dx+11,dy-16-(f%4),1,1,'#5b618f'); px(dx+13,dy-19-((f+2)%4),1,1,'#5b618f');
+  const bus=$('#bus');
+  const socketEls={};
+  ROW.forEach((k,idx)=>{
+    const a=AG[k];
+    const col=document.createElement('div');
+    col.className='col '+(idx%2?'drop':'lift');
+    const wrap=document.createElement('div');
+    wrap.className= k==='relay'?'relaywrap':'';
+    const chip=mkChip(k,a);
+    wrap.appendChild(chip);
+    if(k==='relay'){ wrap.appendChild(mkDaughter('scribe',AG.scribe)); }
+    col.appendChild(wrap);
+    bus.appendChild(col);
+    socketEls[k]=chip;
+    // FORGE hangs under CLOSER
+    if(k==='closer'){
+      const fcol=document.createElement('div');fcol.style.marginTop='14px';fcol.style.width='100%';fcol.style.display='flex';fcol.style.justifyContent='center';
+      const fchip=mkChip('forge',AG.forge);fchip.style.maxWidth='168px';
+      fcol.appendChild(fchip);col.appendChild(fcol);socketEls.forge=fchip;
     }
-  }
-  function char(x,y,hue,state,f){
-    const dim = state==='standby'?0.55:1;
-    // hair/head
-    px(x,y,5,1, rgb([60,52,40],dim)); px(x,y+1,5,4, rgb([222,180,150],dim));
-    px(x+1,y+2,1,1,'#0c0e1c'); px(x+3,y+2,1,1,'#0c0e1c'); // eyes
-    // body (agent-colored shirt)
-    px(x,y+5,5,5, rgb(hue,dim*1.25));
-    // arms (typing toggle when active)
-    if(state!=='standby' && f%2){ px(x-1,y+6,1,2, rgb(hue,dim*.8)); px(x+5,y+6,1,2, rgb(hue,dim*.8)); }
-    else { px(x-1,y+7,1,2, rgb(hue,dim*.8)); px(x+5,y+7,1,2, rgb(hue,dim*.8)); }
-  }
-  function core(f){
-    const cx=W/2, cy=H/2;
-    // connection lines to the 8 rooms
-    c.strokeStyle='rgba(95,228,239,.16)'; c.lineWidth=1;
-    const cells=[[0,0],[1,0],[2,0],[2,1],[2,2],[1,2],[0,2],[0,1]];
-    c.beginPath(); for(const [cc,rr] of cells){ c.moveTo(cx,cy); c.lineTo(cc*CW+CW/2, rr*CH+CH/2); } c.stroke();
-    // core room
-    const x=CW, y=CH;
-    px(x,y,CW,CH,'#0c0e1c'); px(x+2,y+2,CW-4,CH-4,'rgba(40,80,150,.22)');
-    // pulsing AI orb (concentric diamonds)
-    const p = 1 + (f%6<3?1:0);
-    const ox=x+CW/2, oy=y+CH/2;
-    px(ox-7-p,oy-1,15+2*p,2,'rgba(95,228,239,.25)'); px(ox-1,oy-7-p,2,15+2*p,'rgba(95,228,239,.25)');
-    px(ox-5,oy-5,10,10,'rgba(95,228,239,.5)'); px(ox-3,oy-3,6,6,'#bff0ff'); px(ox-1,oy-2,2,4,'#fff');
-    // JARVIS label bar
-    px(x+2,y+CH-12,CW-4,10,'rgba(8,12,26,.7)');
-  }
-  // ambient data packets travelling the ring
-  const ring=[[0,0],[1,0],[2,0],[2,1],[2,2],[1,2],[0,2],[0,1]];
-  const pts=ring.map(([cc,rr])=>[cc*CW+CW/2, rr*CH+CH/2]);
-  const packets=[0,2.7,5.1].map(s=>({t:s}));
-  function drawPackets(){
-    for(const pk of packets){
-      pk.t=(pk.t+0.012)%pts.length;
-      const i=Math.floor(pk.t), n=(i+1)%pts.length, fr=pk.t-i;
-      const x=pts[i][0]+(pts[n][0]-pts[i][0])*fr, y=pts[i][1]+(pts[n][1]-pts[i][1])*fr;
-      px(x-1,y-1,2,2,'rgba(95,228,239,.9)');
-    }
-  }
-  // ── inside-a-room scene ──
-  function ringPx(x,y,d,col){px(x+1,y,d-2,1,col);px(x+1,y+d-1,d-2,1,col);px(x,y+1,1,d-2,col);px(x+d-1,y+1,1,d-2,col);}
-  function emblem(code,x,y,col){
-    if(code==='SCOUT'){ringPx(x,y,9,col);px(x+8,y+8,5,2,col);}
-    else if(code==='ORACLE'){px(x,y+2,13,7,col);px(x+4,y+4,5,3,'#0c0e1c');px(x+5,y+5,3,1,col);}
-    else if(code==='FORGE'){px(x+5,y,3,8,col);px(x+1,y+8,11,3,col);}
-    else if(code==='SCRIBE'){px(x+9,y,2,9,col);px(x,y+9,10,2,col);}
-    else if(code==='RELAY'){px(x,y+5,13,1,col);px(x+1,y+3,9,1,col);px(x+2,y+1,5,1,col);px(x+10,y+5,3,3,col);}
-    else if(code==='SENTRY'){px(x+2,y,9,3,col);px(x,y+3,13,4,col);px(x+3,y+7,7,3,col);px(x+5,y+10,3,2,col);}
-    else if(code==='CLOSER'){px(x,y,13,13,col);px(x+2,y+3,9,8,'#0c0e1c');px(x+4,y+7,2,2,col);px(x+6,y+5,2,2,col);px(x+8,y+7,2,2,col);}
-    else if(code==='ECHO'){ringPx(x,y,11,col);px(x+5,y+2,1,4,col);px(x+5,y+5,4,1,col);}
-  }
-  function bigChar(x,y,hue,f,state){
-    const act=(state!=='standby'&&f%2),bob=act?-1:0; y+=bob;
-    px(x+2,y,8,2,rgb([70,60,46])); px(x+1,y+2,10,7,rgb([235,190,158]));
-    px(x+3,y+4,2,2,'#0c0e1c'); px(x+7,y+4,2,2,'#0c0e1c'); px(x+4,y+7,4,1,rgb([200,120,110]));
-    px(x,y+9,12,11,rgb(hue,1.2)); px(x+2,y+9,8,2,rgb(hue,1.6));
-    px(x-2,y+(act?10:12),3,4,rgb(hue)); px(x+11,y+(act?10:12),3,4,rgb(hue));
-    if(state==='standby'){px(x+13,y-2-(f%4),2,2,'#8089c0');px(x+16,y-6-((f+2)%4),2,2,'#8089c0');}
-  }
-  function roomScene(a,f){
-    const hue=a.hue,on=a.state!=='standby';
-    px(0,0,W,148,rgb(hue,on?0.5:0.27)); px(0,8,W,3,rgb(hue,1.0));
-    for(let fy=148;fy<H;fy+=8)for(let fx=0;fx<W;fx+=8){const t=((fx/8+fy/8)|0)%2;px(fx,fy,8,8,rgb(hue,t?0.36:0.22));}
-    px(0,148,W,2,rgb(hue,0.95));
-    px(22,26,70,46,'#0c0e1c'); px(25,29,64,40,'#10204a'); px(25,29,64,16,'#21368a');
-    for(const s of [[34,40],[52,36],[70,46],[80,55],[44,58],[60,50]])px(s[0],s[1],1,1,'#cfe0ff');
-    px(57,29,2,40,'#0c0e1c'); px(25,49,64,2,'#0c0e1c');
-    px(214,26,72,48,'#0c0e1c'); px(217,29,66,42,rgb(hue,0.75)); px(217,29,66,2,rgb(hue,1.3));
-    emblem(a.code,236,38,rgb(hue,1.7));
-    px(298,121,9,3,'#0c0e1c'); px(300,109,5,12,rgb([170,90,60])); px(297,100,11,10,rgb([60,195,120])); px(300,95,5,6,rgb([90,225,150]));
-    px(96,162,128,32,rgb(hue,0.5)); px(102,166,116,24,rgb(hue,0.78));
-    px(118,118,84,8,'#4a3a2a'); px(122,126,8,30,'#332618'); px(190,126,8,30,'#332618'); px(118,118,84,2,'#5e4a34');
-    px(150,92,40,26,'#15182e'); px(153,95,34,18,on?rgb(hue,0.95):'#20243f');
-    if(on){for(let i=0;i<4;i++)px(156,98+i*4,((f+i)%5)*5+6,2,rgb(hue,1.6));}
-    px(166,118,8,4,'#15182e'); px(160,122,20,2,'#15182e');
-    bigChar(120,86,hue,f,a.state);
-  }
-  let frame=0, last=0, view='hq', active=null;
-  function draw(){
-    c.clearRect(0,0,W,H);
-    px(0,0,W,H,'#06070f');
-    if(view==='room'&&active){ roomScene(AG[active],frame); }
-    else{
-      c.strokeStyle='rgba(70,80,150,.12)'; for(let gx=0;gx<=W;gx+=CW){c.beginPath();c.moveTo(gx,0);c.lineTo(gx,H);c.stroke();}
-      ORDER.forEach(k=>{const a=AG[k];room(a.cell%3, (a.cell/3)|0, a, frame);});
-      core(frame); drawPackets();
-    }
-    vx.clearRect(0,0,VC.width,VC.height);
-    vx.imageSmoothingEnabled=false;
-    vx.drawImage(off,0,0,W,H,0,0,VC.width,VC.height);
-  }
-  function loop(ts){ if(ts-last>82){ last=ts; frame++; draw(); } requestAnimationFrame(loop); }
-  window.addEventListener('resize',()=>{fit();draw();});
-  fit(); draw(); requestAnimationFrame(loop);
-
-  // view control: go inside a room / come back
-  const rv=document.getElementById('rv');
-  window.enterRoom=function(k){const a=AG[k];if(!a)return;view='room';active=k;
-    document.getElementById('rvtitle').textContent=a.code+' · '+a.role;
-    const stl=document.getElementById('rvst');stl.textContent=a.st;stl.style.color=STDOT[a.state];stl.style.borderColor=STDOT[a.state];
-    document.getElementById('rvbot').innerHTML='<div class="cur">'+a.desc+'</div><div class="wf">'+a.wf.map(w=>'<span>'+w+'</span>').join('')+'</div><div class="kv">'+a.stats.map(s=>'<b>'+s[0]+'</b> <i>'+s[1]+'</i>').join('')+'</div>';
-    rv.classList.add('on'); const g=document.getElementById('grid'); if(g)g.style.display='none';
-    VC.style.opacity=0; requestAnimationFrame(()=>{VC.style.opacity=1;}); draw();};
-  window.exitRoom=function(){view='hq';active=null;rv.classList.remove('on');
-    const g=document.getElementById('grid'); if(g)g.style.display='';
-    VC.style.opacity=0; requestAnimationFrame(()=>{VC.style.opacity=1;}); draw();};
+  });
+  window._sockets=socketEls;
 })();
 
-/* ───────────────── OVERLAY ROOMS (labels + click) ───────────────── */
-(function(){
-  const grid=$('#grid'); const cells=new Array(9).fill(null);
-  ORDER.forEach(k=>{cells[AG[k].cell]={k};});
-  for(let i=0;i<9;i++){
-    const d=document.createElement('div'); d.className='cell';
-    if(i===4){ d.classList.add('core'); d.innerHTML='<span class="tag">JARVIS · CORE</span>'; d.onclick=playBriefing; }
-    else if(cells[i]){ const a=AG[cells[i].k];
-      d.innerHTML=`<span class="tag"><b style="background:${STDOT[a.state]}"></b>${a.code} <i>${a.role}</i></span>`;
-      d.onclick=()=>window.enterRoom(cells[i].k);
-    }
-    grid.appendChild(d);
+function mkChip(k,a){
+  const chip=document.createElement('div');
+  chip.className='chip'+(a.state==='standby'?' standby':'');
+  chip.innerHTML=
+    `<div class="chead"><span class="led"></span><span class="cname">${a.code}</span><span class="cstat">${a.state==='live'?'LIVE':'STBY'}</span></div>`+
+    `<div class="pid">PID ${a.pid}</div>`+
+    `<div class="die"></div>`+
+    `<div class="tel"><div><span>LAST</span> ${a.last}</div><div><span>NEXT</span> ${a.next}</div><div class="thru"><span>FLUX</span> ${a.thru}</div></div>`+
+    `<div class="hand">${a.hand}</div>`+
+    `<div class="pins"><i></i><i></i><i></i><i></i><i></i></div>`;
+  chip.onclick=()=>openAgent(k);
+  registerDie(chip.querySelector('.die'),a);
+  return chip;
+}
+function mkDaughter(k,a){
+  const d=document.createElement('div');d.className='daughter';
+  d.innerHTML=`<div class="dhead"><span class="led"></span><span class="dname">${a.code}</span><span class="dtag">⊂ RELAY · writes copy</span></div><div class="ddie"></div>`;
+  d.onclick=(e)=>{e.stopPropagation();openAgent(k);};
+  registerDie(d.querySelector('.ddie'),a,true);
+  return d;
+}
+function registerDie(el,a,small){
+  const c=mkCanvas(el);
+  dies.push({draw:()=>{const g=c.g,dpr=c.dpr;g.setTransform(dpr,0,0,dpr,0,0);
+      g.clearRect(0,0,c.w(),c.h());DIE[a.die](g,c.w(),c.h(),F,a);},
+    live:()=> true, resize:c.size});
+}
+
+/* ═══════════════ TRACE BUS (connects sockets, animates packets) ═══════════════ */
+const traceCv=$('#trace'); const tg=traceCv.getContext('2d');
+let tpath=[], tlen=[], ttotal=0, fpath=null;
+function resizeTrace(){const r=$('.stage').getBoundingClientRect();const dpr=Math.min(window.devicePixelRatio||1,2);
+  traceCv.width=r.width*dpr;traceCv.height=r.height*dpr;tg.setTransform(dpr,0,0,dpr,0,0);computeTrace();}
+function socketPoint(el){const s=$('.stage').getBoundingClientRect();const r=el.getBoundingClientRect();
+  return {x:r.left-s.left+r.width/2, y:r.bottom-s.top+11};}
+function computeTrace(){
+  if(!window._sockets)return;
+  tpath=ROW.map(k=>socketPoint(window._sockets[k]));
+  tlen=[];ttotal=0;
+  for(let i=1;i<tpath.length;i++){const d=Math.hypot(tpath[i].x-tpath[i-1].x,tpath[i].y-tpath[i-1].y);tlen.push(d);ttotal+=d;}
+  // forge branch: from closer socket down to forge top
+  const cs=socketPoint(window._sockets.closer);
+  const fr=$('.stage').getBoundingClientRect();const fe=window._sockets.forge.getBoundingClientRect();
+  fpath={x1:cs.x,y1:cs.y,x2:fe.left-fr.left+fe.width/2,y2:fe.top-fr.top};
+}
+function ptAt(d){let acc=0;for(let i=0;i<tlen.length;i++){if(d<=acc+tlen[i]){const t=(d-acc)/tlen[i];
+  return {x:tpath[i].x+(tpath[i+1].x-tpath[i].x)*t,y:tpath[i].y+(tpath[i+1].y-tpath[i].y)*t};}acc+=tlen[i];}
+  return tpath[tpath.length-1];}
+function drawTrace(){
+  if(!tpath.length)return;const W=traceCv.width,H=traceCv.height;tg.clearRect(0,0,W,H);
+  // etched trace (under-stroke + neon)
+  tg.lineJoin='round';tg.lineCap='round';
+  tg.strokeStyle='rgba(43,139,149,.55)';tg.lineWidth=4;trLine();
+  tg.strokeStyle='rgba(95,228,239,.85)';tg.lineWidth=1.6;trLine();
+  // forge dotted branch
+  if(fpath){tg.setLineDash([3,4]);tg.strokeStyle='rgba(245,185,66,.55)';tg.lineWidth=1.4;
+    tg.beginPath();tg.moveTo(fpath.x1,fpath.y1);tg.lineTo(fpath.x1,(fpath.y1+fpath.y2)/2);tg.lineTo(fpath.x2,(fpath.y1+fpath.y2)/2);tg.lineTo(fpath.x2,fpath.y2);tg.stroke();tg.setLineDash([]);}
+  // node solder sockets
+  tpath.forEach(p=>{tg.fillStyle='#06080f';tg.fillRect(p.x-3,p.y-3,6,6);tg.strokeStyle='rgba(95,228,239,.7)';tg.lineWidth=1;tg.strokeRect(p.x-3,p.y-3,6,6);});
+  // packets (magenta lead-IDs riding the trace)
+  if(!REDUCED){
+    const speed=ttotal/640;
+    [0,.42,.78].forEach((off,i)=>{const d=(((F*speed/100)+off)%1)*ttotal;const p=ptAt(d);
+      tg.fillStyle=COL.mg;tg.fillRect(p.x-2,p.y-2,4,4);
+      tg.shadowColor=COL.mg;tg.shadowBlur=6;tg.fillRect(p.x-1,p.y-1,2,2);tg.shadowBlur=0;
+      if(i===0){tg.font='8px JetBrains Mono';tg.fillStyle='rgba(255,61,129,.85)';tg.fillText('LD#0'+(173+(F/60|0)%9),p.x+6,p.y-4);}
+    });
   }
+  function trLine(){tg.beginPath();tg.moveTo(tpath[0].x,tpath[0].y);for(let i=1;i<tpath.length;i++)tg.lineTo(tpath[i].x,tpath[i].y);tg.stroke();}
+}
+
+/* ═══════════════ SHIFT RIBBON ═══════════════ */
+const ribCv=$('#rib'); const rg=ribCv.getContext('2d');
+function resizeRib(){const r=$('.ribbon').getBoundingClientRect();const dpr=Math.min(window.devicePixelRatio||1,2);
+  ribCv.width=r.width*dpr;ribCv.height=r.height*dpr;rg.setTransform(dpr,0,0,dpr,0,0);}
+function drawRibbon(){
+  const W=ribCv.width/Math.min(window.devicePixelRatio||1,2), H=ribCv.height/Math.min(window.devicePixelRatio||1,2);
+  rg.clearRect(0,0,W,H);const x0=58,x1=W-10,span=x1-x0,midY=H/2;
+  rg.strokeStyle='rgba(95,228,239,.25)';rg.lineWidth=1;rg.beginPath();rg.moveTo(x0,midY);rg.lineTo(x1,midY);rg.stroke();
+  const X=h=>x0+(h/24)*span;
+  // hour gridlines
+  rg.font='8px JetBrains Mono';rg.textBaseline='middle';
+  for(let hh=0;hh<=24;hh+=6){const x=X(hh);rg.strokeStyle='rgba(95,228,239,.12)';rg.beginPath();rg.moveTo(x,midY-5);rg.lineTo(x,midY+5);rg.stroke();
+    rg.fillStyle='rgba(91,106,125,.8)';rg.fillText((hh<10?'0':'')+hh+':00',x+2,midY+9);}
+  // scheduled fires (codename only; alternate above/below so the 07:00–09:00 cluster doesn't collide)
+  const fires=[['SCOUT',7,-1],['ORACLE',7.5,1],['RELAY',8,-1],['ECHO',9,1]];
+  const now=new Date(); const nowH=now.getHours()+now.getMinutes()/60;
+  rg.font='7px JetBrains Mono';
+  fires.forEach(fr=>{const x=X(fr[1]);const past=fr[1]<nowH;
+    rg.strokeStyle=past?'rgba(95,228,239,.3)':COL.cy;rg.globalAlpha=past?.55:1;rg.lineWidth=1.4;
+    rg.beginPath();rg.moveTo(x,midY-7);rg.lineTo(x,midY+7);rg.stroke();
+    rg.fillStyle=past?'rgba(95,228,239,.5)':COL.cy;
+    rg.fillText(fr[0],x+2,fr[2]<0?midY-11:midY+13);rg.globalAlpha=1;});
+  rg.font='8px JetBrains Mono';
+  // SENTRY 2h comb
+  for(let hh=0;hh<24;hh+=2){const x=X(hh);rg.fillStyle='rgba(95,228,239,.3)';rg.fillRect(x-.5,midY-3,1,6);}
+  rg.fillStyle='rgba(91,106,125,.7)';rg.fillText('SENTRY ▸ every 2h',X(13),midY+9);
+  // CLOSER/FORGE event markers
+  rg.fillStyle='rgba(245,185,66,.7)';rg.fillText('⚡ CLOSER / FORGE · on-demand',X(18.4),midY-12);
+  // NOW playhead
+  const nx=X(Math.max(0,Math.min(24,nowH)));
+  rg.strokeStyle=COL.mg;rg.lineWidth=1;rg.beginPath();rg.moveTo(nx,2);rg.lineTo(nx,H-2);rg.stroke();
+  rg.fillStyle=COL.mg;rg.beginPath();rg.moveTo(nx-3,2);rg.lineTo(nx+3,2);rg.lineTo(nx,6);rg.fill();
+}
+
+/* ═══════════════ JARVIS CORE GLYPH ═══════════════ */
+const jc=$('#jcore'); const jg=jc.getContext('2d');
+let speaking=false;
+function drawJCore(){
+  const dpr=1; jg.setTransform(dpr,0,0,dpr,0,0); jg.clearRect(0,0,40,40);
+  const cx=20,cy=20;
+  for(let i=0;i<3;i++){const r=5+i*5+(speaking?Math.sin(F*.3+i)*2:Math.sin(F*.05+i)*1);
+    jg.strokeStyle=`rgba(95,228,239,${.6-i*.15})`;jg.lineWidth=1;jg.beginPath();jg.arc(cx,cy,r,0,7);jg.stroke();}
+  jg.fillStyle=COL.cy;jg.fillRect(cx-2,cy-2,4,4);
+  if(speaking){jg.fillStyle=COL.mg;for(let i=0;i<5;i++){const bh=4+Math.abs(Math.sin(F*.4+i))*9;jg.fillRect(cx-9+i*4,34-bh,2,bh);}}
+}
+
+/* ═══════════════ DECRYPT LOG TICKER ═══════════════ */
+const EVENTS=[
+  '07:00 SCOUT ▸ +30 leads ▸ deduped vs CRM',
+  '07:30 ORACLE ▸ 14 emails enriched ▸ ~50% hit',
+  '08:00 RELAY ▸ cold emails sent ▸ SPF·DKIM·DMARC ok',
+  '09:00 ECHO ▸ follow-up bumps sent ▸ +3d cadence',
+  'SENTRY ▸ inbox scan ▸ classifying replies ▸ every 2h',
+  'CLOSER ▸ booking link sent ▸ Flickinger Painting',
+  'CLOSER ▸ booking link sent ▸ Wallace Plumbing',
+  'JARVIS ▸ kernel online ▸ awaiting orders, sir'
+];
+(function(){const el=$('#logline');let idx=0;
+  function decode(target,done){const chars='@#%&0xff><_/01';let i=0;
+    const iv=setInterval(()=>{i++;let s='';for(let j=0;j<target.length;j++){s+= j<i? target[j] : chars[(j+i)%chars.length];}
+      el.textContent=s;if(i>=target.length){clearInterval(iv);done&&done();}},14);}
+  function cycle(){decode(EVENTS[idx],()=>{idx=(idx+1)%EVENTS.length;setTimeout(cycle,3400);});}
+  cycle();
 })();
 
-/* ───────────────── WARM LEADS ───────────────── */
+/* ═══════════════ WARM SIGNALS ═══════════════ */
 (function(){
+  $('#warmcount').textContent=LEADS.length+' WARM';
   $('#warm').innerHTML=LEADS.map((l,i)=>
-    `<div class="lead" data-i="${i}"><span class="av" style="background:${l.g}">${l.i}</span>`+
+    `<div class="sig" data-i="${i}"><span class="rt"><span class="rd" style="background:${l.g};box-shadow:0 0 6px ${l.g}"></span></span>`+
     `<span class="nm">${l.n}<s>${l.sub}</s></span><span class="sg">${l.sg}</span></div>`).join('');
-  $('#warm').querySelectorAll('.lead').forEach(el=>el.onclick=()=>openLead(LEADS[+el.dataset.i]));
+  $('#warm').querySelectorAll('.sig').forEach(el=>el.onclick=()=>openLead(LEADS[+el.dataset.i]));
 })();
 
-/* ───────────────── DRAWER ───────────────── */
-const scrim=$('#scrim'), draw=$('#draw'), drawin=$('#drawin');
-function openDraw(html){drawin.innerHTML='<span class="x" onclick="closeDraw()">✕</span>'+html;scrim.classList.add('on');draw.classList.add('on');}
-function closeDraw(){scrim.classList.remove('on');draw.classList.remove('on');}
-scrim.onclick=closeDraw;
-function openAgent(k){const a=AG[k];
-  openDraw(`<div class="code" style="color:${rgbs(a.hue)}">${a.code}</div><div class="role">${a.role}</div>`+
-    `<span class="st" style="border-color:${STDOT[a.state]};color:${STDOT[a.state]}">${a.st}</span>`+
+/* ═══════════════ DRAWER ═══════════════ */
+const scrim=$('#scrim'),drawEl=$('#draw'),drawin=$('#drawin');
+function openDraw(html){drawin.innerHTML='<span class="x" onclick="closeDraw()">✕</span>'+html;scrim.classList.add('on');drawEl.classList.add('on');}
+function closeDraw(){scrim.classList.remove('on');drawEl.classList.remove('on');}
+window.closeDraw=closeDraw;scrim.onclick=closeDraw;
+function openAgent(k){const a=AG[k];const c=a.state==='live'?'#5fe4ef':'#f5b942';
+  openDraw(`<div class="code" style="color:${c}">${a.code}</div><div class="role">${a.role}</div>`+
+    `<span class="st" style="border-color:${c};color:${c}">${a.state==='live'?'● LIVE':'○ STANDBY'} · PID ${a.pid}</span>`+
     `<p>${a.desc}</p>`+
     `<div class="sec">Workflow</div><ul class="wf">${a.wf.map(w=>`<li>${w}</li>`).join('')}</ul>`+
-    `<div class="sec">Stats</div><div class="kv">${a.stats.map(s=>`<div><div class="v">${s[0]}</div><div class="k">${s[1]}</div></div>`).join('')}</div>`+
-    `<div class="sec">Recent</div>${a.rec.map(r=>`<div class="rec">${r}</div>`).join('')}`);}
+    `<div class="sec">Telemetry</div><div class="kv">${a.stats.map(s=>`<div><div class="v">${s[0]}</div><div class="k">${s[1]}</div></div>`).join('')}</div>`+
+    `<div class="sec">Recent activity</div>${a.rec.map(r=>`<div class="rec">${r}</div>`).join('')}`);}
 function openLead(l){
   openDraw(`<div class="code" style="color:${l.g}">${l.i}</div><div class="role">${l.n}</div>`+
     `<span class="st" style="border-color:${l.g};color:${l.g}">${l.sg}</span>`+
-    `<p>${l.body}</p><div class="sec">Niche</div><p style="color:var(--ink2)">${l.sub}</p>`);}
-const rgbs=a=>`rgb(${a[0]},${a[1]},${a[2]})`;
+    `<p>${l.body}</p><div class="sec">Niche</div><p style="color:var(--mut)">${l.sub}</p>`);}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDraw();});
 
-/* ───────────────── CLOCK ───────────────── */
+/* ═══════════════ CLOCK ═══════════════ */
 setInterval(()=>{$('#clock').textContent=new Date().toLocaleTimeString('en-US',{hour12:false})+' PT';},1000);
 
-/* ───────────────── JARVIS (voice + conversation) ───────────────── */
-const cap=$('#cap'), ask=$('#ask'), micB=$('#mic'), spkB=$('#spk');
-let voiceOn=true, listening=false, rec=null, convo=[];
+/* ═══════════════ JARVIS — voice + conversation (preserved contracts) ═══════════════ */
+const cap=$('#cap'),ask=$('#ask'),micB=$('#mic'),spkB=$('#spk');
+let voiceOn=true,listening=false,recog=null,convo=[];
 spkB.onclick=()=>{voiceOn=!voiceOn;spkB.classList.toggle('on',voiceOn);spkB.textContent=voiceOn?'VOICE':'MUTED';if(!voiceOn)speechSynthesis.cancel();};
 function setCap(t,say){cap.textContent=t;cap.classList.toggle('say',!!say);}
 function pickVoice(){const v=speechSynthesis.getVoices();return v.find(x=>/daniel/i.test(x.name))||v.find(x=>/en-GB/i.test(x.lang)&&/male|daniel|arthur|george/i.test(x.name))||v.find(x=>/en-GB/i.test(x.lang))||v.find(x=>/en/i.test(x.lang))||v[0];}
-function speak(t){if(!voiceOn||!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);const v=pickVoice();if(v)u.voice=v;u.rate=.94;u.pitch=.86;speechSynthesis.speak(u);}
+function speak(t){if(!voiceOn||!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);const v=pickVoice();if(v)u.voice=v;u.rate=.94;u.pitch=.86;
+  speaking=true;u.onend=()=>{speaking=false;};speechSynthesis.speak(u);}
 function respond(t){setCap(t,true);speak(t);}
-
 function playBriefing(){
-  const recap="Good evening, sir. Your pipeline holds 104 leads across San Luis Obispo County — 8 warm, 28 in active follow-up. The hottest is Flickinger Painting; Luisa would like to book. Wallace Plumbing and Exact Fit are waiting on a Meet link. No meetings booked yet, no clients signed — you are brand new. SCOUT now runs every morning, filling your pipeline on its own. The work today, sir, is the phone.";
+  const recap="Good evening, sir. Your pipeline holds 170-odd leads across San Luis Obispo County, and the full fleet now runs unattended — SCOUT prospects at seven, ORACLE enriches, RELAY sends, ECHO follows up, SENTRY watches the inbox, and CLOSER books the warm ones. Flickinger and Wallace both have booking links out; no meetings confirmed yet, no clients signed. The work today, sir, is to land that first booking.";
   respond(recap);
 }
-function scripted(q){
-  q=q.toLowerCase();
-  if(/recap|brief|good evening|status|where are we|agents?/.test(q))return playBriefing();
-  if(/warm|hot|lead/.test(q))return respond("Eight warm, sir. Flickinger wants to book; Wallace and Exact Fit await a Meet link; Kyle, Dan’s and Brad’s are interested. Flickinger first.");
-  if(/scout|prospect/.test(q))return respond("SCOUT is live, sir — 104 leads in the CRM, and it adds more every morning entirely on its own.");
+function scripted(q){q=q.toLowerCase();
+  if(/recap|brief|good evening|status|where are we|agents?|fleet/.test(q))return playBriefing();
+  if(/warm|hot|lead/.test(q))return respond("Six warm, sir. Flickinger and Wallace have links out; Exact Fit, Kyle, Dan's and Brad's are interested. Flickinger first.");
+  if(/scout|prospect/.test(q))return respond("SCOUT is live, sir — 170-odd leads in the CRM, and it adds roughly thirty more every morning on its own.");
+  if(/relay|send|email/.test(q))return respond("RELAY is sending, sir — up to fifteen cold emails a day from your authenticated domain, with SCRIBE writing each one.");
   if(/hello|hey|hi|jarvis/.test(q))return respond("At your service, sir.");
   if(/thank/.test(q))return respond("A pleasure, sir.");
-  return respond("Noted, sir. The fleet stands ready — say ‘briefing’ for the full picture.");
+  return respond("Noted, sir. The fleet stands ready — say 'briefing' for the full picture.");
 }
 async function askJarvis(text){
-  if(!text)return; ask.value='';
+  if(!text)return;ask.value='';
   const _dk=deckRequest(text);
-  if(_dk){ setCap('“'+text+'”'); showDeckFor(_dk); return; }
-  setCap('“'+text+'”');
-  convo.push({role:'user',content:text});
+  if(_dk){setCap('“'+text+'”');showDeckFor(_dk);return;}
+  setCap('“'+text+'”');convo.push({role:'user',content:text});
   try{
     const r=await fetch('https://cbc-jarvis.charlie-d44.workers.dev',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({messages:convo})});
-    if(!r.ok)throw 0; const d=await r.json(); const t=d.text||'';
-    if(!t)throw 0; convo.push({role:'assistant',content:t}); respond(t);
-  }catch(_){ convo.pop(); scripted(text); }
+    if(!r.ok)throw 0;const d=await r.json();const t=d.text||'';
+    if(!t)throw 0;convo.push({role:'assistant',content:t});respond(t);
+  }catch(_){convo.pop();scripted(text);}
 }
-/* ── FORGE deck: ask Jarvis "show me a plan/deck for X" ── */
-function deckRequest(text){
-  const t=text.toLowerCase();
+/* FORGE deck — preserved worker contract */
+function deckRequest(text){const t=text.toLowerCase();
   if(!/\bfor\b/.test(t))return null;
   const strong=/\b(deck|pitch|presentation|slide|slides|slideshow)\b/.test(t);
   const planv=/\bplan\b/.test(t)&&/\b(build|make|create|show|generate|pull up|put together|prepare|whip up|give me|let me see|draft|do)\b/.test(t);
   if(!(strong||planv))return null;
-  const m=text.match(/\bfor\s+(.+)$/i); if(!m)return null;
+  const m=text.match(/\bfor\s+(.+)$/i);if(!m)return null;
   let name=m[1].replace(/[.?!,]+$/,'').replace(/\b(please|now|asap|today|thanks|thank you)\b/ig,'').trim();
   if(!name||/^(me|us|it|now|today|tomorrow|yesterday|(this|next|last|the)\s+(morning|afternoon|evening|day|week|weekend|month|year))$/i.test(name))return null;
-  return name;
-}
+  return name;}
 let _deckBuilding=false;
 async function showDeckFor(name){
-  if(_deckBuilding)return;
-  _deckBuilding=true;
+  if(_deckBuilding)return;_deckBuilding=true;AG.forge._build=true;
   setCap('Building '+name+'’s growth plan, sir…',true);
   let niche='',city='San Luis Obispo';
   const hit=LEADS.find(l=>{const a=l.n.toLowerCase(),b=name.toLowerCase();return a.includes(b)||b.includes(a);});
   if(hit){const parts=(hit.sub||'').split('·').map(s=>s.trim());if(parts[0])niche=parts[0];if(parts[1])city=(parts[1]==='SLO'?'San Luis Obispo':parts[1]);name=hit.n;}
   try{
     const r=await fetch('https://cbc-jarvis.charlie-d44.workers.dev',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({mode:'plan',business:{name:name,niche:niche,city:city}})});
-    if(!r.ok)throw 0;
-    const d=await r.json(); const p=d.plan;
-    if(!p||!p.business)throw 0;
-    renderDeck(p);
+    if(!r.ok)throw 0;const d=await r.json();const p=d.plan;
+    if(!p||!p.business)throw 0;renderDeck(p);
     respond('Here is '+(p.business||name)+'’s growth plan, sir. Use the arrows to walk through it.');
-  }catch(_){ respond('Forgive me, sir — I couldn’t put that deck together. Try the exact business name.'); }
-  finally{ _deckBuilding=false; }
+  }catch(_){respond('Forgive me, sir — I couldn’t put that deck together. Try the exact business name.');}
+  finally{_deckBuilding=false;AG.forge._build=false;}
 }
 function deckSlides(p){
   const a=p.audience||{},ang=p.angles||[];
@@ -564,11 +797,11 @@ function deckSlides(p){
 }
 function renderDeck(p){
   closeDeck();
-  const ov=document.createElement('div'); ov.className='deckov'; ov.id='deckov';
+  const ov=document.createElement('div');ov.className='deckov';ov.id='deckov';
   ov.innerHTML='<div class="deckwrap"><button class="deckx" onclick="closeDeck()">✕ CLOSE</button><div class="deckstage">'+deckSlides(p).join('')+'</div><div class="decknav"><button class="dbtn" id="dprev">‹</button><span class="ddots" id="ddots"></span><button class="dbtn" id="dnext">›</button></div></div>';
   document.body.appendChild(ov);
-  const ds=[...ov.querySelectorAll('.dslide')]; let idx=0;
-  const dots=ov.querySelector('#ddots'); dots.innerHTML=ds.map((_,i)=>'<span class="ddot'+(i?'':' on')+'"></span>').join('');
+  const ds=[...ov.querySelectorAll('.dslide')];let idx=0;
+  const dots=ov.querySelector('#ddots');dots.innerHTML=ds.map((_,i)=>'<span class="ddot'+(i?'':' on')+'"></span>').join('');
   const dd=[...dots.querySelectorAll('.ddot')];
   const go=n=>{idx=Math.max(0,Math.min(ds.length-1,n));ds.forEach((s,i)=>s.classList.toggle('on',i===idx));dd.forEach((x,i)=>x.classList.toggle('on',i===idx));};
   ov.querySelector('#dprev').onclick=()=>go(idx-1);
@@ -578,31 +811,42 @@ function renderDeck(p){
   document.addEventListener('keydown',ov._key);
 }
 function closeDeck(){const ov=document.getElementById('deckov');if(ov){if(ov._key)document.removeEventListener('keydown',ov._key);ov.remove();}}
+window.closeDeck=closeDeck;
 ask.addEventListener('keydown',e=>{if(e.key==='Enter')askJarvis(ask.value.trim());});
 
 /* speech-to-text */
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 function startListen(){
   if(!SR){setCap('Speech recognition not supported — type instead.');return;}
-  if(listening)return; listening=true; micB.classList.add('on'); setCap('Listening…');
-  rec=new SR(); rec.lang='en-US'; rec.interimResults=true; rec.continuous=false;
-  rec.onresult=ev=>{let t='';for(const r of ev.results)t+=r[0].transcript;ask.value=t;setCap('“'+t+'”');};
-  rec.onend=()=>{listening=false;micB.classList.remove('on');const t=ask.value.trim();if(t)askJarvis(t);};
-  rec.onerror=()=>{listening=false;micB.classList.remove('on');};
-  try{rec.start();}catch(_){listening=false;micB.classList.remove('on');}
+  if(listening)return;listening=true;micB.classList.add('listening');setCap('Listening…');
+  recog=new SR();recog.lang='en-US';recog.interimResults=true;recog.continuous=false;
+  recog.onresult=ev=>{let t='';for(const r of ev.results)t+=r[0].transcript;ask.value=t;setCap('“'+t+'”');};
+  recog.onend=()=>{listening=false;micB.classList.remove('listening');const t=ask.value.trim();if(t)askJarvis(t);};
+  recog.onerror=()=>{listening=false;micB.classList.remove('listening');};
+  try{recog.start();}catch(_){listening=false;micB.classList.remove('listening');}
 }
 micB.onclick=startListen;
 document.addEventListener('keydown',e=>{if(e.code==='Space'&&document.activeElement!==ask&&!document.getElementById('deckov')){e.preventDefault();startListen();}});
-
-/* clap-to-listen (throttled, cheap) */
+/* clap-to-listen */
 if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
   navigator.mediaDevices.getUserMedia({audio:true}).then(s=>{try{
     const AC=window.AudioContext||window.webkitAudioContext,ac=new AC(),src=ac.createMediaStreamSource(s),an=ac.createAnalyser();
-    an.fftSize=512;src.connect(an);const d=new Uint8Array(an.fftSize);let prev=0,lastC=0,lp=0;
-    (function loop(){const now=performance.now();if(now-lp>60){lp=now;an.getByteTimeDomainData(d);let pk=0;for(let i=0;i<d.length;i++){const v=Math.abs(d[i]-128);if(v>pk)pk=v;}if(pk>72&&prev<36&&now-lastC>900){lastC=now;startListen();}prev=pk;}requestAnimationFrame(loop);})();
+    an.fftSize=512;src.connect(an);const dz=new Uint8Array(an.fftSize);let prev=0,lastC=0,lp=0;
+    (function loop(){const now=performance.now();if(now-lp>60){lp=now;an.getByteTimeDomainData(dz);let pk=0;for(let i=0;i<dz.length;i++){const v=Math.abs(dz[i]-128);if(v>pk)pk=v;}if(pk>72&&prev<36&&now-lastC>900){lastC=now;startListen();}prev=pk;}requestAnimationFrame(loop);})();
   }catch(_){}}).catch(()=>{});
 }
 if(window.speechSynthesis)speechSynthesis.onvoiceschanged=()=>{};
+
+/* JARVIS core click → briefing */
+$('#jcore').style.cursor='pointer';$('#jcore').onclick=playBriefing;
+
+/* ═══════════════ BOOT ═══════════════ */
+function bootLayout(){resizeTrace();resizeRib();dies.forEach(d=>d.resize&&d.resize());}
+window.addEventListener('resize',()=>{bootLayout();});
+// fonts/layout settle, then compute trace geometry
+setTimeout(bootLayout,60);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>setTimeout(bootLayout,30));
+requestAnimationFrame(tick);
 </script>
 </body>
 </html>
